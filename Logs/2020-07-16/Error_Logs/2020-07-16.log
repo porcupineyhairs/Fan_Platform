@@ -1,0 +1,57 @@
+2020-07-16 16:15:04,550 - /home/mi/PycharmProjects/Fan_Platform/comments/log.py - ERROR - log  - 76 - F
+2020-07-16 16:15:25,698 - /home/mi/PycharmProjects/Fan_Platform/comments/log.py - ERROR - log  - 76 - hha
+2020-07-16 16:20:15,302 - /home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py - ERROR - userOpt  - 78 - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "/home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py", line 68, in post
+    Part.query.get_or_404(part_id)
+  File "/home/mi/flask/lib/python3.6/site-packages/flask_sqlalchemy/__init__.py", line 424, in get_or_404
+    abort(404, description=description)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 822, in abort
+    return _aborter(status, *args, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2020-07-16 16:21:52,355 - /home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py - ERROR - userOpt  - 78 - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "/home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py", line 68, in post
+    Part.query.get_or_404(part_id)
+  File "/home/mi/flask/lib/python3.6/site-packages/flask_sqlalchemy/__init__.py", line 424, in get_or_404
+    abort(404, description=description)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 822, in abort
+    return _aborter(status, *args, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2020-07-16 16:22:23,708 - /home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py - ERROR - userOpt  - 78 - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "/home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py", line 68, in post
+    Part.query.get_or_404(part_id)
+  File "/home/mi/flask/lib/python3.6/site-packages/flask_sqlalchemy/__init__.py", line 424, in get_or_404
+    abort(404, description=description)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 822, in abort
+    return _aborter(status, *args, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2020-07-16 16:23:07,797 - /home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py - ERROR - userOpt  - 78 - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "/home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py", line 68, in post
+    Part.query.get_or_404(part_id)
+  File "/home/mi/flask/lib/python3.6/site-packages/flask_sqlalchemy/__init__.py", line 424, in get_or_404
+    abort(404, description=description)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 822, in abort
+    return _aborter(status, *args, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2020-07-16 16:23:17,795 - /home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py - ERROR - userOpt  - 78 - 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+Traceback (most recent call last):
+  File "/home/mi/PycharmProjects/Fan_Platform/App/Api/userOpt.py", line 68, in post
+    Part.query.get_or_404(part_id)
+  File "/home/mi/flask/lib/python3.6/site-packages/flask_sqlalchemy/__init__.py", line 424, in get_or_404
+    abort(404, description=description)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 822, in abort
+    return _aborter(status, *args, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
