@@ -55,3 +55,10 @@ Traceback (most recent call last):
   File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
     raise self.mapping[code](*args, **kwargs)
 werkzeug.exceptions.NotFound: 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.
+2020-07-16 19:49:53,162 - /home/mi/Fan_Platform/App/Api/userOpt.py - ERROR - userOpt  - 73 - 'Part' object has no attribute 'name'
+Traceback (most recent call last):
+  File "/home/mi/Fan_Platform/App/Api/userOpt.py", line 69, in get
+    "parts": [{"id": p.id, "name": p.name} for p in part]
+  File "/home/mi/Fan_Platform/App/Api/userOpt.py", line 69, in <listcomp>
+    "parts": [{"id": p.id, "name": p.name} for p in part]
+AttributeError: 'Part' object has no attribute 'name'

@@ -78,3 +78,5 @@ class Part(db.Model):
 
     def __repr__(self):
         return f"part:{self.Part_Name}"
+
+

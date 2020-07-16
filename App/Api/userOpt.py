@@ -9,6 +9,7 @@ from flask_restful import Resource, Api
 
 from App import db, auth
 from App.Api import v1
+from App.Api.errors_and_auth import is_admin
 from Model.Models import Part, User
 from comments.log import get_log
 
@@ -29,27 +30,51 @@ class NewPart(Resource):
     """增加部門"""
 
     @auth.login_required
+    @is_admin
     def post(self):
-        if not g.user.is_superuser():
-            return jsonify(dict(code=2, err="无权限")), 401
+        partName = request.json.get('partName')
+        if not partName:
+            return jsonify(dict(code=1, err="参数错误"))
+        try:
+            part = Part.query.filter(Part.Part_Name == partName).first()
+            if part:
+                return jsonify(dict(code=1, err="部门名称存在"))
+            new_part = Part(partName=partName)
+            db.session.add(new_part)
+            db.session.commit()
+            return jsonify(dict(code=0, msg='ok'))
+        except Exception as e:
+            db.session.rollback()
+            log.exception(e)
+            return jsonify(dict(code=1, err=f"错误:{str(e)}"))
+        finally:
+            db.session.close()
 
-        else:
-            partName = request.json.get('partName')
-            if not partName:
-                return jsonify(dict(code=1, err="参数错误"))
-            try:
-                part = Part.query.filter(Part.Part_Name == partName).first()
-                if part:
-                    return jsonify(dict(code=1, err="部门名称存在"))
-                new_part = Part(partName=partName)
-                db.session.add(new_part)
-                db.session.commit()
-                return jsonify(dict(code=0, msg='ok'))
-            except Exception as e:
-                db.session.rollback()
-                return jsonify(dict(code=1, err=f"错误:{str(e)}"))
-            finally:
-                db.session.close()
+    @auth.login_required
+    @is_admin
+    def get(self):
+        """查询部门"""
+        try:
+            partId = request.args.get("partId")
+            if partId:
+                part = Part.quert.get(partId)
+                if not part:
+                    return jsonify(dict(code=1, err=f"partId:{partId} 错误或不存在"))
+                part = [part]
+            else:
+                part = Part.query.all()
+
+            data = {
+                "code": 0,
+                "parts": [{"id": p.id, "Part_Name": p.Part_Name,
+                           "users": [{"uid": i.id, "name": i.username, 'email': i.email, "phone": i.phone} for i in
+                                     p.Part_Users.all()]} for p in part]
+
+            }
+            return jsonify(data)
+        except Exception as e:
+            log.exception(str(e))
+            return jsonify(dict(code=1, err=str(e)))
 
 
 # 用户侧删改查
@@ -92,9 +117,8 @@ class UserOpt(Resource):
             db.session.close()
 
     @auth.login_required
+    @is_admin
     def get(self):
-        if not g.user.is_superuser():
-            return jsonify(dict(code=2, err="无权限")), 401
         user_id = request.args.get("id")
         try:
             if user_id:
@@ -106,9 +130,9 @@ class UserOpt(Resource):
                 user = User.query.all()
 
             data = {
-                "code":0,
+                "code": 0,
                 "user": [{"id": i.id, "name": i.username, "email": i.email, "gender": i.gender, "part": i.part} for i
-                            in user]
+                         in user]
             }
             return jsonify(data)
         except Exception as e:
@@ -117,9 +141,8 @@ class UserOpt(Resource):
             return jsonify(dict(code=1, err=f"错误:{str(e)}"))
 
     @auth.login_required
+    @is_admin
     def delete(self):
-        if not g.user.is_superuser():
-            return jsonify(dict(code=2, err="无权限")), 401
         id = request.json.get('id')
         if not id:
             return jsonify(dict(code=1, err="id 参数错误"))
@@ -137,5 +160,5 @@ class UserOpt(Resource):
 
 
 api_script = Api(v1)
-api_script.add_resource(NewPart, "/new_part")
+api_script.add_resource(NewPart, "/partOpt")
 api_script.add_resource(UserOpt, '/userOpt')
