@@ -15,19 +15,14 @@ from App.Api.errors_and_auth import InvalidUsage, is_admin
 
 class Index(Resource):
 
-    @auth.login_required
-    @is_admin
     def get(self):
         print(auth.username())
-        data =[i for i in range(10)]
-        print(data[0])
-        return jsonify(dict(msg="index",data=data))
+        return "ok"
 
-
-@v1.route('/err')
+@v1.route("/testUrl",endpoint='testfunc')
 def get_foo():
-    raise InvalidUsage("errrr", status_code=500)
-
+    # raise InvalidUsage("errrr", status_code=500)
+    return "ok"
 
 
 

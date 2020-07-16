@@ -8,6 +8,7 @@ class Config:
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     # FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     # FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     # FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
@@ -22,7 +23,6 @@ class DevelopmentConfig(Config):
 
     CACHE_TYPE = 'simple'
     CACHE_DEFAULT_TIMEOUT = 300
-
     # MAIL_SERVER = 'smtp.googlemail.com'
     # MAIL_PORT = 587
     # MAIL_USE_TLS = True
@@ -34,6 +34,9 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
+    CACHE_TYPE = 'simple'
+    CACHE_DEFAULT_TIMEOUT = 300
+    WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
 
 
