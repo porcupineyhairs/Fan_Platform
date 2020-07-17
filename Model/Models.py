@@ -17,7 +17,7 @@ from App import db
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(32), unique=True, index=True)
+    username = db.Column(db.String(32), unique=True, index=True,comment="用户名")
     password = db.Column(db.String(128))
     email = db.Column(db.String(52), nullable=True, unique=False)
     phone = db.Column(db.String(12), unique=False, nullable=True)
@@ -27,7 +27,7 @@ class User(db.Model):
     # 所属部门
     part = db.Column(db.Integer, db.ForeignKey("part.id"), nullable=True)
 
-    def __init__(self, username, password, phone=None, email=email, partId=None, admin=None, gender=None):
+    def __init__(self, username, password, phone=None, email=None, partId=None, admin=None, gender=None):
         self.username = username
         self.part = partId
         self.admin = admin
@@ -61,6 +61,11 @@ class User(db.Model):
         except:
             return None
         return User.query.get(data['id'])
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
 
     def __repr__(self):
         return f"username:{self.username}"

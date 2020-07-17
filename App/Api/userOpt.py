@@ -4,6 +4,7 @@
 @name: userOpt
 @desc: 用户接口
 """
+
 from flask import jsonify, request, g
 from flask_restful import Resource, Api
 
@@ -104,9 +105,7 @@ class UserOpt(Resource):
 
             user = User(username=username, phone=phone, password=password, email=email, partId=part_id, gender=gender,
                         admin=admin)
-
-            db.session.add(user)
-            db.session.commit()
+            user.save()
             return jsonify(dict(code=0, uid=user.id, msg=f"hello {user.username}"))
         except Exception as e:
             log.exception(e)
@@ -157,6 +156,18 @@ class UserOpt(Resource):
             return jsonify(dict(code=1, err=f"错误:{str(e)}"))
         finally:
             db.session.close()
+
+
+@v1.route('/addUsers')
+def addUsers():
+    """增加测试用户"""
+    from faker import Faker
+    f = Faker(locale="zh_CN")
+
+    users = [User(username=f.name(), password=f.pystr(), partId=1,phone=f.phone_number(), email=f.email()) for i in range(10)]
+    db.session.add_all(users)
+    db.session.commit()
+    return 'ok'
 
 
 api_script = Api(v1)
