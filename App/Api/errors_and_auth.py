@@ -27,7 +27,7 @@ from .. import auth
 
 @v1.app_errorhandler(404)
 def page_not_found(e):
-    return jsonify(dict(err="请求的地址有点问题,再康康")),404
+    return jsonify(dict(err="请求的数据找不着,再康康")),404
 
 @v1.app_errorhandler(500)
 def host_err(e):

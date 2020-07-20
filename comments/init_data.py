@@ -55,5 +55,6 @@ def add_part(nums: int):
     db.session.commit()
 
 
+
 if __name__ == '__main__':
     add_user(nums=1,superUser=True)

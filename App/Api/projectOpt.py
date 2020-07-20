@@ -13,7 +13,7 @@ from comments.log import get_log
 from . import v1
 from .errors_and_auth import is_admin
 from .. import auth, db
-from comments.UniqueOpt import Unique
+
 log = get_log(__file__)
 
 
@@ -27,17 +27,16 @@ class ProjectOpt(Resource):
         try:
             pid = request.args.get("projectId")
             if pid:
-                projects = Project.query.get(pid)
-                if not projects:
-                    return jsonify(dict(code=1, err="id錯誤或不存在"))
-                projects = [projects]
+                projects = [Project.get(pid)]
             else:
                 projects = Project.all()
-
             data = {
                 "code": 0,
-                "projects": [{"id": i.id, "project_name": i.project_name, "project_desc": i.project_desc} for i
-                             in projects]
+                "msg": "ok",
+                "data": [
+                    {"id": i.id, "status": i.status, "project_name": i.project_name, "project_desc": i.project_desc} for
+                    i
+                    in projects]
             }
             return jsonify(data)
         except Exception as e:
@@ -58,10 +57,8 @@ class ProjectOpt(Resource):
         if p:
             return jsonify(dict(code=1, err="projectName存在了"))
         try:
-            p = Project(name=pName, desc=pDesc)
-            p.save()
-
-            return jsonify(dict(code=0, msg="ok"))
+            Project(name=pName, desc=pDesc).save()
+            return jsonify(dict(code=0, data="", msg="ok"))
         except Exception as e:
             log.exception(e)
             return jsonify(dict(code=0, err=f"{e}"))
@@ -77,13 +74,11 @@ class ProjectOpt(Resource):
             return jsonify(dict(code=1, err="传入必传"))
 
         try:
-            p = Project.query.get(pId)
-            if not p:
-                return jsonify(dict(code=1, err="projectId 错误或不存在"))
+            p = Project.get(pId)
             p.project_name = pName
             p.project_desc = pDesc
             db.session.commit()
-            return jsonify(dict(code=0, msg="ok"))
+            return jsonify(dict(code=0, data=p.id, msg="ok"))
 
         except Exception as e:
             log.exception(e)
@@ -95,13 +90,10 @@ class ProjectOpt(Resource):
         projectId = request.json.get('projectId')
         if not projectId:
             return jsonify(dict(code=1, err="projectId不能为空"))
-        p = Project.quert.get(projectId)
-        if not p:
-            return jsonify(dict(code=1, err="projectId 错误或不存在"))
         try:
-            db.session.delete(p)
-            db.session.commit()
-            return jsonify(dict(code=0, msg="ok"))
+            p = Project.get(projectId)
+            p.delete()
+            return jsonify(dict(code=0, data="", msg="ok"))
         except Exception as e:
             log.exception(e)
             return jsonify(dict(code=0, err=f"{e}"))

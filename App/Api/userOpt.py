@@ -7,6 +7,7 @@
 
 from flask import jsonify, request, g
 from flask_restful import Resource, Api
+
 from App import db, auth
 from App.Api import v1
 from App.Api.errors_and_auth import is_admin
@@ -41,8 +42,7 @@ class NewPart(Resource):
                 return jsonify(dict(code=1, err="部门名称存在"))
             new_part = Part(partName=partName)
             new_part.save()
-
-            return jsonify(dict(code=0, msg='ok'))
+            return jsonify(dict(code=0, data=new_part.id, msg='ok'))
         except Exception as e:
             db.session.rollback()
             log.exception(e)
@@ -57,19 +57,18 @@ class NewPart(Resource):
         try:
             partId = request.args.get("partId")
             if partId:
-                part = Part.quert.get(partId)
-                if not part:
-                    return jsonify(dict(code=1, err=f"partId:{partId} 错误或不存在"))
-                part = [part]
+                part = [Part.get(partId)]
             else:
                 part = Part.all()
 
             data = {
                 "code": 0,
-                "parts": [{"id": p.id, "Part_Name": p.Part_Name,
-                           "users": [{"uid": i.id, "name": i.username, 'email': i.email, "phone": i.phone} for i in
-                                     p.Part_Users.all()]} for p in part]
-
+                "msg": "ok",
+                "data": [{"id": p.id, "status": p.status, "Part_Name": p.Part_Name,
+                          "users": [
+                              {"uid": i.id, "status": i.status, "name": i.username, 'email': i.email, "phone": i.phone}
+                              for i in
+                              p.Part_Users.all()]} for p in part]
             }
             return jsonify(data)
         except Exception as e:
@@ -105,7 +104,7 @@ class UserOpt(Resource):
             user = User(username=username, phone=phone, password=password, email=email, partId=part_id, gender=gender,
                         admin=admin)
             user.save()
-            return jsonify(dict(code=0, uid=user.id, msg=f"hello {user.username}"))
+            return jsonify(dict(code=0, data=user.id, msg=f"hello {user.username}"))
         except Exception as e:
             log.exception(e)
 
@@ -120,23 +119,19 @@ class UserOpt(Resource):
         user_id = request.args.get("id")
         try:
             if user_id:
-                user = User.query.get(user_id)
-                if not user:
-                    return jsonify(dict(code=1, err="id錯誤或不存在"))
-                user = [user]
+                user = [User.get(user_id)]
             else:
                 user = User.all()
-
             data = {
                 "code": 0,
-                "user": [{"id": i.id, "name": i.username, "email": i.email, "gender": i.gender, "part": i.part} for i
-                         in user]
-            }
+                "msg": "ok",
+                "data": [{"id": i.id, "status": i.status, "name": i.username, "email": i.email, "gender": i.gender,
+                          "part": i.part, } for i in user]}
             return jsonify(data)
         except Exception as e:
             db.session.rollback()
             log.exception(str(e))
-            return jsonify(dict(code=1, err=f"错误:{str(e)}"))
+            return jsonify(dict(code=1, data="", err=f"错误:{str(e)}"))
 
     @auth.login_required
     @is_admin
@@ -145,9 +140,8 @@ class UserOpt(Resource):
         if not id:
             return jsonify(dict(code=1, err="id 参数错误"))
         try:
-            user = User.query.get(id)
-            user.delete()
-            return jsonify(dict(code=0, msg='ok'))
+            User.get(id).delete()
+            return jsonify(dict(code=0, data="", msg='ok'))
         except Exception as e:
             log.exception(e)
             db.session.rollback()
