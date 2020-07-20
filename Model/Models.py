@@ -30,12 +30,17 @@ class Base(db.Model):
         return cls.query.filter_by().all()
 
     @classmethod
-    def get(cls,id):
-        return cls.query.get_or_405(id)
+    def get(cls, id):
+        return cls.query.get_or_NoFound(id)
 
     def save(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -43,7 +48,6 @@ class Base(db.Model):
             db.session.commit()
         except Exception as e:
             log.exception(e)
-            raise e
 
 
 # 用戶
@@ -125,6 +129,15 @@ class Project(Base):
     def __repr__(self):
         return f"project_name:{self.project_name}"
 
+    def delete(self):
+        self.status = self.DELETE_STATUS
+        # 级联修改状态
+        for module in self.module_records:
+            module.status = self.DELETE_STATUS
+            for case in module.case_records:
+                case.status = self.DELETE_STATUS
+        db.session.commit()
+
     # 添加一个动态属性
     @property
     def module_records(self):
@@ -144,6 +157,18 @@ class Module(Base):
         self.module_desc = desc
         self.module_name = name
         self.project_id = pid
+
+
+    def delete(self):
+        self.status = self.DELETE_STATUS
+        try:
+            for case in self.case_records:
+                case.status = self.DELETE_STATUS
+            db.session.commit()
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+
 
     @property
     def case_records(self):

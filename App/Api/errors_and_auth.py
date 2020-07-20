@@ -12,18 +12,10 @@ from . import v1
 from .. import auth
 
 
+@v1.after_request
+def after_request(response):
+    return response
 
-# @v1.app_errorhandler(HTTPException)
-# def errHandler(e):
-#     res = e.get_response()
-#     res.data = json.dumps({
-#         "code":e.code,
-#         "name":e.name,
-#         "desc":e.description
-#     })
-#     res.content_type = "application/json"
-#     return res
-#     # return jsonify(dict(err="请求的方法有点问题,再康康")),405
 
 @v1.app_errorhandler(404)
 def page_not_found(e):
@@ -35,11 +27,11 @@ def host_err(e):
 @v1.app_errorhandler(403)
 def host_err(e):
     return jsonify(dict(err="有问题啊,再康康吧")),500
-
-
 @auth.error_handler
 def unauthorized():
     return jsonify(dict(err="请求没有权限啊,在康康")), 401
+
+
 
 
 @auth.verify_password

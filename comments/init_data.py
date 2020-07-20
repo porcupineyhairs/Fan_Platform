@@ -54,7 +54,16 @@ def add_part(nums: int):
         db.session.add(p)
     db.session.commit()
 
+def add_module(nums:int):
+    """增加接口"""
 
+
+    create_app().app_context().push()
+
+    for i in range(nums):
+        p = Module(name=f.job(),desc=f.pystr(),pid=1)
+        db.session.add(p)
+    db.session.commit()
 
 if __name__ == '__main__':
-    add_user(nums=1,superUser=True)
+    add_module(nums=10)

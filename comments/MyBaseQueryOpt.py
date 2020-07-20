@@ -19,9 +19,13 @@ class MyBaseQuery(BaseQuery):
         kwargs.setdefault("status", 1)
         return super().filter_by(**kwargs)
 
-    def get_or_405(self, ident):
+    def get_or_NoFound(self, ident):
         rv = self.get(ident)
-        if not rv:
-            err_msg = "id錯誤或不存在"
-            abort(404, err_msg)
+        if not rv :
+            err_msg = "id错误"
+            abort(406, err_msg)
+        if rv.status == 0:
+            err_msg = "id已刪除"
+            abort(406, err_msg)
+
         return rv
