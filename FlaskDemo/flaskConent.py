@@ -6,6 +6,8 @@
 """
 import sys
 
+from werkzeug.local import LocalStack
+
 from FlaskDemo import app
 from flask import _request_ctx_stack,_app_ctx_stack,appcontext_pushed,appcontext_popped
 
@@ -118,6 +120,13 @@ class AppContext(object):
         if BROKEN_PYPY_CTXMGR_EXIT and exc_type is not None:
             reraise(exc_type, exc_value, tb)
 
-
+"""
+#context locals
+_request_ctx_stack = LocalStack() #LocalStack()包含pop、push方法以及Local对象，上下文通过该对象push和pop
+_app_ctx_stack = LocalStack()
+current_app = LocalProxy(_find_app)
+request = LocalProxy(partial(_lookup_req_object, 'request')) #reuqest是LocalProxy的对象，设置和获取request对象中的属性通过LocalProxy定义的各种双下划线实现
+session = LocalProxy(partial(_lookup_req_object, 'session'))
+g = LocalProxy(partial(_lookup_app_object, 'g'))"""
 if __name__ == '__main__':
     app.run()

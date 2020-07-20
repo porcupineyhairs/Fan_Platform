@@ -12,11 +12,23 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from App import db
 
-
-# 用戶
-class User(db.Model):
-    __tablename__ = 'user'
+class Base(db.Model):
+    __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    create_time = db.Column(db.Integer,default=int(time.time()))
+    update_time = db.Column(db.Integer,default=int(time.time()),onupdate=int(time.time()))
+    status = db.Column(db.SmallInteger,default=1)
+
+    @classmethod
+    def all(cls):
+        return cls.query.all()
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+# 用戶
+class User(Base):
+    __tablename__ = 'user'
     username = db.Column(db.String(32), unique=True, index=True,comment="用户名")
     password = db.Column(db.String(128))
     email = db.Column(db.String(52), nullable=True, unique=False)
@@ -62,9 +74,7 @@ class User(db.Model):
             return None
         return User.query.get(data['id'])
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
+
 
 
     def __repr__(self):
@@ -72,9 +82,8 @@ class User(db.Model):
 
 
 # 部门
-class Part(db.Model):
+class Part(Base):
     __tablename__ = 'part'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Part_Name = db.Column(db.String(32), unique=True)
     Part_Users = db.relationship("User", backref="user_part", lazy="dynamic")
 
@@ -85,3 +94,20 @@ class Part(db.Model):
         return f"part:{self.Part_Name}"
 
 
+
+# project
+class Project(Base):
+    __tablename__ = "project"
+    project_name = db.Column(db.String(32),nullable=False,default="",unique=True)
+    project_desc = db.Column(db.String(500),nullable=False,default="")
+
+    def __init__(self,name,desc):
+        self.project_desc = desc
+        self.project_name = name
+
+
+
+
+
+    def __repr__(self):
+        return f"project_name:{self.project_name}"

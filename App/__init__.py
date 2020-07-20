@@ -17,6 +17,9 @@ def create_app(config_name="default"):
     from .Api import v1
     app.register_blueprint(v1)
 
+    # 添加一个过滤器
+    from App.Api.temp import str_time
+    app.add_template_filter(str_time)
 
     import Model.Models
     return app

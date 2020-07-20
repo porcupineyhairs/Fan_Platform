@@ -7,7 +7,6 @@
 
 from flask import jsonify, request, g
 from flask_restful import Resource, Api
-
 from App import db, auth
 from App.Api import v1
 from App.Api.errors_and_auth import is_admin
@@ -41,8 +40,8 @@ class NewPart(Resource):
             if part:
                 return jsonify(dict(code=1, err="部门名称存在"))
             new_part = Part(partName=partName)
-            db.session.add(new_part)
-            db.session.commit()
+            new_part.save()
+
             return jsonify(dict(code=0, msg='ok'))
         except Exception as e:
             db.session.rollback()
@@ -63,7 +62,7 @@ class NewPart(Resource):
                     return jsonify(dict(code=1, err=f"partId:{partId} 错误或不存在"))
                 part = [part]
             else:
-                part = Part.query.all()
+                part = Part.all()
 
             data = {
                 "code": 0,
@@ -126,7 +125,7 @@ class UserOpt(Resource):
                     return jsonify(dict(code=1, err="id錯誤或不存在"))
                 user = [user]
             else:
-                user = User.query.all()
+                user = User.all()
 
             data = {
                 "code": 0,
@@ -156,18 +155,6 @@ class UserOpt(Resource):
             return jsonify(dict(code=1, err=f"错误:{str(e)}"))
         finally:
             db.session.close()
-
-
-@v1.route('/addUsers')
-def addUsers():
-    """增加测试用户"""
-    from faker import Faker
-    f = Faker(locale="zh_CN")
-
-    users = [User(username=f.name(), password=f.pystr(), partId=1,phone=f.phone_number(), email=f.email()) for i in range(10)]
-    db.session.add_all(users)
-    db.session.commit()
-    return 'ok'
 
 
 api_script = Api(v1)
