@@ -146,8 +146,7 @@ class UserOpt(Resource):
             return jsonify(dict(code=1, err="id 参数错误"))
         try:
             user = User.query.get(id)
-            db.session.delete(user)
-            db.session.commit()
+            user.delete()
             return jsonify(dict(code=0, msg='ok'))
         except Exception as e:
             log.exception(e)

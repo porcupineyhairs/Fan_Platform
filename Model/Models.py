@@ -12,24 +12,33 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from App import db
 
+
 class Base(db.Model):
+    DELETE_STATUS = 0
+
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    create_time = db.Column(db.Integer,default=int(time.time()))
-    update_time = db.Column(db.Integer,default=int(time.time()),onupdate=int(time.time()))
-    status = db.Column(db.SmallInteger,default=1)
+    create_time = db.Column(db.Integer, default=int(time.time()))
+    update_time = db.Column(db.Integer, default=int(time.time()), onupdate=int(time.time()))
+    status = db.Column(db.SmallInteger, default=1)
 
     @classmethod
     def all(cls):
-        return cls.query.all()
+        return cls.query.filter_by().all()
 
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+    def delete(self):
+        self.status = self.DELETE_STATUS
+        db.session.commit()
+
+
 # 用戶
 class User(Base):
     __tablename__ = 'user'
-    username = db.Column(db.String(32), unique=True, index=True,comment="用户名")
+    username = db.Column(db.String(32), unique=True, index=True, comment="用户名")
     password = db.Column(db.String(128))
     email = db.Column(db.String(52), nullable=True, unique=False)
     phone = db.Column(db.String(12), unique=False, nullable=True)
@@ -74,9 +83,6 @@ class User(Base):
             return None
         return User.query.get(data['id'])
 
-
-
-
     def __repr__(self):
         return f"username:{self.username}"
 
@@ -94,20 +100,15 @@ class Part(Base):
         return f"part:{self.Part_Name}"
 
 
-
 # project
 class Project(Base):
     __tablename__ = "project"
-    project_name = db.Column(db.String(32),nullable=False,default="",unique=True)
-    project_desc = db.Column(db.String(500),nullable=False,default="")
+    project_name = db.Column(db.String(32), nullable=False, default="", unique=True)
+    project_desc = db.Column(db.String(500), nullable=False, default="")
 
-    def __init__(self,name,desc):
+    def __init__(self, name, desc):
         self.project_desc = desc
         self.project_name = name
-
-
-
-
 
     def __repr__(self):
         return f"project_name:{self.project_name}"

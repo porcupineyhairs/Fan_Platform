@@ -1,10 +1,14 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, BaseQuery
 from flask_httpauth import HTTPBasicAuth
 from flask_caching import Cache
+
+from comments.MyBaseQueryOpt import MyBaseQuery
 from comments.config import config
 
-db = SQLAlchemy()
+
+
+db = SQLAlchemy(query_class=MyBaseQuery)
 auth = HTTPBasicAuth()
 catch = Cache()
 
