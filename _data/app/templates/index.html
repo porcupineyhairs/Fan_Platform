@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}首页{% endblock %}
+
+{% block content %}
+    <!--内容部分-->
+    <div class="content">
+        <ul>
+            <!--展示项目-->
+            {% for project in projects[:5] %}
+            <li class="project">
+                <div class="pro_title">{{ project.project_name }}</div>
+
+                <!--TODO:写完接口和用例的关系设计用  project.modules | length  获取-->
+                <p>接口数:13</p>
+                <p>用例数:30</p>
+                <div class="del_pro"><a href="">删除项目</a></div>
+            </li>
+            {% endfor %}
+
+            <li class="project">
+                <div class="add">
+                    <img src="{{ url_for('static', filename='assets/img/ico.png') }}" alt="">
+                </div>
+
+            </li>
+        </ul>
+
+        <div style="height:400px; width: 100%;float: left"></div>
+
+    </div>
+
+
+    <!--弹框内容-->
+{#    <div class="back hide">#}
+{#        <div class="alter_add">#}
+{#            <div class="alter-title">新增项目</div>#}
+{#            <div class="alter_quit">#}
+{#                <img src="{{ url_for('static', filename='assets/img/ico01.png') }}">#}
+{#            </div>#}
+{#            <form action="">#}
+{#                <div class="alter_input">#}
+{#                    <label for="pro_title">项目名称 :</label>#}
+{#                    <input type="text" name="title" id="pro_title">#}
+{#                </div>#}
+{##}
+{#                <div class="alter_input">#}
+{#                    <label for="pro_url">项目地址 :</label>#}
+{#                    <input type="text" name="title" id="pro_url">#}
+{#                </div>#}
+{##}
+{#                <div class="alter_input">#}
+{#                    <label for="pro_test">测试人员 :</label>#}
+{#                    <input type="text" name="title" id="pro_test">#}
+{#                </div>#}
+{##}
+{#                <div class="pro_desc">#}
+{#                    <label for="">项目描述 :</label>#}
+{#                    <textarea name="" id="" cols="25" rows="5"></textarea>#}
+{#                </div>#}
+{#                <div class="pro_tj">#}
+{#                    <input class="tj" type="button" value="提交">#}
+{#                </div>#}
+{#            </form>#}
+{#        </div>#}
+{#    </div>#}
+
+
+
+    <script type="text/javascript">
+        // 添加项目 跳出弹框
+        $('.add').click(function () {
+            $('.back').addClass('show');
+        });
+        //关闭弹框
+        $('.alter_quit').click(function () {
+            $('.back').removeClass('show');
+        });
+        $('.tj').click(function () {
+            $('.back').removeClass('show');
+        });
+
+
+    </script>
+
+
+
+{% endblock %}

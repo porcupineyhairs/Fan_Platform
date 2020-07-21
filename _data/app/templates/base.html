@@ -1,0 +1,142 @@
+<!doctype html>
+<html class="no-js" lang="zh-CN">
+<head>
+    {% block header %} {% endblock %}
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>lemon测试-{% block title %} {% endblock %}</title>
+    <meta name="keywords" content="index">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <meta name="apple-mobile-web-app-title" content="lemonTester"/>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script  src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.1.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/amazeui/2.7.2/css/amazeui.min.css" rel="stylesheet">
+
+{#    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" media="screen"/>#}
+{#    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/css/fileinput.css"/>#}
+{#    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>#}
+{#    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.js"></script>#}
+{#    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>#}
+{#    <script src="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/js/fileinput.min.js"></script>#}
+{#    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap-fileinput/4.4.8/css/fileinput.min.css"/>#}
+{#    <link href="https://cdn.bootcss.com/amazeui/2.7.2/css/amazeui.css" rel="stylesheet">#}
+{#        <script src="http://cdn.staticfile.org/amazeui/1.0.0-rc1/css/amazeui.min.css"></script>#}
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/common.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/amazeui/2.7.2/js/amazeui.min.js"></script>
+{#    <script src="https://cdn.bootcss.com/jquery.serializeJSON/2.9.0/jquery.serializejson.min.js"></script>#}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ext-language_tools.js" type="text/javascript"
+            charset="utf-8"></script>
+    <script src="//apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/js/jquery.serializejson.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/commons.js') }}"></script>
+
+
+</head>
+<body class="modal-open">
+
+
+<!-- 弹框内容，操作是否成功 -->
+<div class="am-modal am-modal-alert" tabindex="-1" id="my-alert">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd">柠檬提示</div>
+        <div class="am-modal-bd" id="my-alert_print">
+            Sorry，服务器可能开小差啦, 请重试!
+        </div>
+        <div class="am-modal-footer">
+            <span class="am-modal-btn">确定</span>
+        </div>
+    </div>
+</div>
+
+<div class="am-cf admin-main">
+    <div class="daohang">
+        <div class="title">柠檬班测试平台</div>
+        <ul>
+            <li>
+                <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
+                        onclick="location.href='{{ url_for('web.index') }}'">返回首页</button>
+            </li>
+            <li>
+                <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
+                        onclick="location.href='{{ url_for('web.list_projects') }}'">项目列表
+                </button>
+            </li>
+            <li>
+                <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
+                        onclick="location.href='{{ url_for('web.list_modules') }}'">接口列表
+                </button>
+            </li>
+            <li>
+                <button type="button" class="am-btn am-btn-default am-radius am-btn-xs"
+                        onclick="location.href='{{ url_for('web.list_cases') }}'">用例列表
+                </button>
+            </li>
+
+
+        </ul>
+
+
+    </div>
+    <div class="nav-navicon admin-main admin-sidebar">
+
+
+        <div class="sideMenu">
+            <h3 class="am-icon-folder"><em></em> <a href="#">项目管理</a></h3>
+            <ul>
+                <li><a href="{{ url_for('web.list_projects') }}">项 目 列 表</a></li>
+                <li><a href="{{ url_for('web.create_project') }}">新 增 项 目</a></li>
+            </ul>
+            <h3 class="am-icon-th-list"><em></em> <a href="#"> 接口管理</a></h3>
+            <ul>
+                <li><a href="{{ url_for('web.list_modules') }}">接 口 列 表</a></li>
+                <li><a href="{{ url_for('web.create_module') }}">新 增 接口</a></li>
+            </ul>
+            <h3 class="am-icon-bug"><em></em> <a href="#">用例管理</a></h3>
+            <ul>
+                <li><a href="{{ url_for('web.list_cases') }}">用 例 列 表</a></li>
+                <li><a href="{{ url_for('web.create_case') }}">新 增 用 例</a></li>
+            </ul>
+
+
+            <h3 class="am-icon-soundcloud"><em></em> <a href="#">测试套件</a></h3>
+            <ul>
+                <li><a href="{{ url_for('web.suites') }}">测 试 套 件 管 理</a></li>
+                <li><a href="{{ url_for('web.create_suite') }}">创 建 套 件</a></li>
+            </ul>
+
+
+
+        </div>
+    </div>
+
+
+
+    {% block content %}
+
+    {% endblock %}
+
+    <script type="text/javascript">
+        jQuery(".sideMenu").slide({
+            titCell: "h3", //鼠标触发对象
+            targetCell: "ul", //与titCell一一对应，第n个titCell控制第n个targetCell的显示隐藏
+            effect: "slideDown", //targetCell下拉效果
+            delayTime: 300, //效果时间
+            triggerTime: 150, //鼠标延迟触发时间（默认150）
+            defaultPlay: true,//默认是否执行效果（默认true）
+            returnDefault: false //鼠标从.sideMen移走后返回默认状态（默认false）
+        });
+
+
+
+    </script>
+</div>
+
+</body>
+</html>

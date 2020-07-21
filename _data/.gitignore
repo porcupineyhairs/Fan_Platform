@@ -1,0 +1,12 @@
+*.py[cod]
+__pycache__/
+
+.idea/
+reports/
+suite/
+
+log/
+case_log/
+report/
+
+

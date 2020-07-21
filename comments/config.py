@@ -1,13 +1,18 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+case_log_path = os.path.join(root_path, 'case_log')
+if not os.path.exists(case_log_path):
+    os.mkdir(case_log_path)
 
 class Config:
     SECRET_KEY = 'hard to guess string'
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    CASE_LOG_PATH = case_log_path
 
     # FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     # FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'

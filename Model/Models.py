@@ -8,6 +8,7 @@ import time
 
 import jwt
 from flask import current_app
+from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from App import db
@@ -27,7 +28,7 @@ class Base(db.Model):
 
     @classmethod
     def all(cls):
-        return cls.query.filter_by().all()
+        return cls.query.filter_by().order_by(desc(cls.id)).all()
 
     @classmethod
     def get(cls, id):
