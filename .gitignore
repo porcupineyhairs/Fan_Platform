@@ -1,4 +1,11 @@
-__pycache__/
 *.py[cod]
-/Logs/
+__pycache__/
+
+.idea/
+reports/
+suite/
+
+log/
+case_log/
+report/
 

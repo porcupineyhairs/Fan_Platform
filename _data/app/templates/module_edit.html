@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}编辑接口{% endblock %}
+
+
+{% block content %}
+
+    <div class=" admin-content">
+
+        <div class="admin-biaogelist">
+            <div class="listbiaoti am-cf">
+                <ul class="am-icon-flag on"> 编辑接口</ul>
+                <dl class="am-icon-home" style="float: right;"> 当前位置： 接口管理 > <a href="#">编辑接口</a></dl>
+            </div>
+            <div class="fbneirong">
+                {% set msgs =  get_flashed_messages()%}
+                {% if msgs %}
+                    {{ msgs[0] }}
+                {% endif %}
+                <form class="form-horizontal" id="add_module" action="{{ url_for("web.edit_module", m_id=module.id) }}" method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group  has-feedback">
+                        {{ form.module_name.label(class="control-label col-md-1 text-primary") }}
+                        <div class="col-md-5">
+                            {{ form.module_name(class='form-control') }}
+                        </div>
+                    </div>
+                    <div class="form-group  has-feedback">
+                        {{ form.project_id.label(class="control-label col-md-1 text-primary") }}
+                        <div class="col-md-5">
+                            {{ form.project_id(class='form-control') }}
+                        </div>
+                    </div>
+                    <div class="form-group  has-feedback">
+                        {{ form.simple_desc.label(class="control-label col-md-1 text-primary") }}
+                        <div class="col-md-5">
+                            {{ form.simple_desc(class='form-control') }}
+                        </div>
+                    </div>
+                    <input type="submit" class="am-btn am-btn-success am-radius">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

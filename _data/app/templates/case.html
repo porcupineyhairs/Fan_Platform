@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+{% block title %}新增接口{% endblock %}
+
+
+{% block content %}
+    {% set methods=['GET','POST', 'PUT', 'DELETE'] %}
+
+    <div class=" admin-content">
+
+        <div class="admin-biaogelist">
+            <div class="listbiaoti am-cf">
+                <ul class="am-icon-flag on"> 新增用例</ul>
+                <dl class="am-icon-home" style="float: right;"> 当前位置： 用例管理 > <a href="#">新增用例</a></dl>
+            </div>
+            <div class="fbneirong">
+                <div class="form-horizontal" id="add_module">
+{#                    {{ form.hidden_tag() }}#}
+                    {% if form.errors %}
+                        {{ form.errors[0] }}
+                    {% endif %}
+
+                    <!-- 接口简介 -->
+                    <div class="form-group  has-feedback">
+                        {{ form.name.label(class="control-label col-md-1 text-primary") }}
+                        <div class="col-md-5">
+                            {{ form.name(class='form-control') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary">选择项目</label>
+                        <div class="col-md-5">
+                            <select class="form-control" id="project_id" name="project_id"
+                                    onchange="load_module(this, '#module_id')">
+                                <option value="请选择">请选择</option>
+                                {% for foo in project %}
+                                    <option value="{{ foo.id }}">{{ foo.project_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group  has-feedback">
+                        <label class="control-label col-md-1 text-primary">选择接口</label>
+                        <div class="col-md-5">
+                            <select class="form-control" id="module_id" name="module_id">
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr/>
+
+                    <div class="am-tabs am-margin">
+                        <ul class="am-tabs-nav am-nav am-nav-tabs" id="tab-test">
+{#                            <li><a href="javascript:;" data-target="#tab1">用例信息</a></li>#}
+                            <li><a href="javascript:;" data-target="#tab1">请求设置</a></li>
+                            <li><a href="javascript:;" data-target="#tab2">验证数据</a></li>
+                            <li><a href="javascript:;" data-target="#tab3">变量|参数|钩子</a></li>
+                        </ul>
+
+                        <div class="am-tabs-bd">
+
+                            <!-- 请求参数 -->
+                            <div class="am-tab-panel" id="tab1">
+                                <div class="form-inline">
+                                    <div class="input-group">
+                                        <label class="input-group-addon">URL</label>
+                                        <input name="url" id="url" class="form-control">
+{#                                    {{ form.url.label(class="input-group-addon") }}#}
+{#                                    {{ form.url(placeholder='接口 url', class="form-control") }}#}
+                                    </div>
+
+                                    <div class="input-group">
+                                        <label class="input-group-addon">请求方法</label>
+                                        <select name='method' id="method" class='form-control'
+                                                                style='height: 25px; font-size: 15px; padding-top: 0px; padding-left: 0px; border: none'>
+{#                                            <option>{{ test_data.request.method }}</option>#}                                            {% for foo in methods %}
+                                                <option value="{{ foo }}">{{ foo }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <button class="btn btn-info" value="添 加" id="add_data" onclick="add_row('data')">添加参数
+                                    </button>
+                                    <button class="btn btn-danger" value="删 除" id="del_data" onclick="del_row('data')">删除参数
+                                    </button>
+                                    <button class="btn btn-info" value="添 加" onclick="add_row('header')">添加header</button>
+                                    <button class="btn btn-danger" value="删 除" onclick="del_row('header')">删除heder</button>
+                                </div>
+
+                                <br>
+                                <form id="form_request_data">
+                                    <table class="table table-hover table-condensed table-bordered table-striped" id="data">
+                                        <caption>data:</caption>
+                                        <thead>
+                                            <tr class="active text-success">
+                                                <th width="5%" align="center">Option</th>
+                                                <th width="30%" align="center">Key</th>
+                                                <th width="60%" align="center">Value</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+
+                                <form id="form_request_headers">
+                                    <table class="table table-hover table-condensed table-bordered table-striped" id="header">
+                                        <caption>headers:</caption>
+                                        <thead>
+                                        <tr class="active text-success">
+                                            <th width="5%" align="center">Option</th>
+                                            <th width="40%" align="center">Key</th>
+                                            <th width="55%" align="center">Value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+
+                            <div class="am-tab-panel" id="tab2">
+                                <button class="btn btn-info" value="添 加" onclick="add_row('extract')">添加摘录
+                                </button>
+                                <button class="btn btn-danger" value="删 除" onclick="del_row('extract')">删除摘录
+                                </button>
+                                <button class="btn btn-info" value="添 加" onclick="add_row('validate')">添加 验证数据</button>
+                                <button class="btn btn-danger" value="删 除" onclick="del_row('validate')">删除 验证数据</button>
+                                <form id="form_extract">
+                                    <table class="table table-hover table-condensed table-bordered table-striped" id="extract">
+                                        <caption>extract:</caption>
+                                        <thead>
+                                        <tr class="active text-success">
+                                            <th width="5%" align="center">Option</th>
+                                            <th width="30%" align="center">Key</th>
+                                            <th width="55%" align="center">Value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+
+                                <form id="form_validate">
+                                    <table class="table table-hover table-condensed table-bordered table-striped" id="validate">
+                                        <caption>validate:</caption>
+                                        <thead>
+                                        <tr class="active text-success">
+                                            <th width="2%" align="center">Option</th>
+                                            <th width="32%" align="center">Check</th>
+                                            <th width="10%" align="center">Comparator</th>
+                                            <th width="48%" align="center">Expected</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+
+
+                            <div class="am-tab-panel" id="tab3">
+                                <button class="btn btn-info" value="添 加" onclick="add_row('variables')">添加变量</button>
+                                <button class="btn btn-danger" value="删 除" onclick="del_row('variables')">删除变量</button>
+                                <button class="btn btn-info" value="添 加" onclick="add_params('params')">添加参数</button>
+                                <button class="btn btn-danger" value="删 除" onclick="del_row('params')">删除参数</button>
+                                <button class="btn btn-info" value="添 加" onclick="add_row('hooks')">添加钩子</button>
+                                <button class="btn btn-danger" value="删 除" onclick="del_row('hooks')">删除钩子</button>
+
+                                <form id="form_variables">
+                                    <table class="table table-hover table-condensed table-bordered table-striped" id="variables">
+                                        <caption>Variables:</caption>
+                                        <thead>
+                                        <tr class="active text-success">
+                                            <th width="5%" align="center">Option</th>
+                                            <th width="30%" align="center">Key</th>
+                                            <th width="10%" align="center">Type</th>
+                                            <th width="55%" align="center">Value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+
+                                <form id="form_params">
+                                    <table class="table table-hover table-condensed table-bordered table-striped" id="params">
+                                        <caption>parameters:</caption>
+                                        <thead>
+                                        <tr class="active text-success">
+                                            <th width="5%" align="center">Option</th>
+                                            <th width="20%" align="center">Key</th>
+                                            <th width="75%" align="center">Value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+
+                                <form id="form_hooks">
+                                    <table class="table table-hover table-condensed table-bordered table-striped" id="hooks">
+                                        <caption>hooks:</caption>
+                                        <thead>
+                                        <tr class="active text-success">
+                                            <th width="5%" align="center">Option</th>
+                                            <th width="47.5%" align="center">setup_hooks</th>
+                                            <th width="47.5%" align="center">teardown_hooks</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </form>
+
+                            </div>
+                        </div>
+
+                        <hr/>
+                        <br/>
+
+                        <div>
+                            包含用例：
+                        </div>
+
+                        <div class="am-tab-panel">
+                            <div style="float: left; width: 40%;">
+                                <form class="form-horizontal" id="belong_message">
+                                    <div class="form-group">
+                                        <div class="input-group col-md-10 col-md-offset-1">
+                                            <div class="input-group-addon" style="color: #0a628f">所属项目</div>
+{#                                            {{ include_form.project(class='form-control', onchange='load_module(this, "#module")') }}#}
+
+                                            <select id='project' name="project" class="form-control"
+                                                    onchange="load_module(this, '#module')">
+                                                <option value="请选择">请选择</option>
+                                                {% for foo in project %}
+                                                    <option value="{{ foo.id }}">{{ foo.project_name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="input-group col-md-10 col-md-offset-1">
+                                            <div class="input-group-addon" style="color: #0a628f">可选接口</div>
+                                            <select id="module" name="module" class="form-control"
+                                                    onchange="load_case(this, '#case')">
+                                            </select>
+{#                                            {{ include_form.module(class='form-control', onchange='load_case(this, "#case")') }}#}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="input-group col-md-10 col-md-offset-1">
+                                            <div class="input-group-addon" style="color: #0a628f">可选用例</div>
+{#                                            <select id="belong_case_id" name="include" class="form-control">#}
+{#                                            </select>#}
+{#                                            {{ include_form.case(class='form-control', onchange='load_case(this, "#case")') }}#}
+                                            <select id="case" name="case" class="form-control">
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="input-group col-md-10 col-md-offset-1">
+                                            <div class="input-group-addon" style="color: #0a628f">可选配置</div>
+                                            <select id="config" name="config" class="form-control">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div style="float: right; width: 50%;margin-right: 1%;">
+                                 <div class="form-group">
+                                        <div class="input-group col-md-10 ">
+                                            <div class="input-group-addon" id="close_collapse" style="color: #0a628f">用例列表</div>
+
+                                            <a class="am-btn am-btn-primary am-radius am-btn-block" href="#" id="pre_collapse"
+                                               style="font-size: 16px; background-color: #fff; color: #555; text-align: left"
+                                               data-am-collapse="{target: '#pre_case'}">
+                                                用 例 执 行 顺 序
+                                            </a>
+                                            <nav>
+                                                <ul id="pre_case" class="am-nav">
+                                                </ul>
+                                            </nav>
+
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="am-form-group am-cf">
+                    <div class="you" style="margin-left: 11%;">
+                        <button id="save" type="button" class="am-btn am-btn-success am-radius">点 击 提 交
+                        </button>&nbsp;
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <script>
+        $("#tab-test").on("click", "li", function () {
+            $(this).addClass("am-active").siblings("li").removeClass("am-active");
+            var target = $(this).children("a").attr("data-target");
+            $(target).addClass("am-active").siblings(".am-tab-panel").removeClass("am-active");
+        }).find("li").eq(0).trigger("click");
+
+        $('#save').on('click', function () {
+            var name = $("#name").val();
+            var module_id = $("#module_id").val();
+            var url = $("#url").val();
+            var method = $("#method").val();
+            var dataType = $("#DataType").val();
+            {#var caseInfo = $("#form_message").val();#}
+            var variables = $("#form_variables").serializeJSON();
+            var request_data = $("#form_request_data").serializeJSON();
+            var headers = $("#form_request_headers").serializeJSON();
+            var extract = $("#form_extract").serializeJSON();
+            var validate = $("#form_validate").serializeJSON();
+            var parameters = $('#form_params').serializeJSON();
+            var hooks = $('#form_hooks').serializeJSON();
+            var includes = [];
+            var i = 0;
+            $("ul#pre_case li a").each(function () {
+                includes[i++] = [$(this).attr('id'), $(this).text()];
+            });
+
+            const test = {
+                "name": name,
+                "module_id": module_id,
+                "parameters": parameters,
+                "url": url,
+                "method": method,
+                "headers": headers,
+                "request_datas": request_data,
+                "type": dataType,
+                "variables": variables,
+                "extracts": extract,
+                "validates": validate,
+                "hooks": hooks,
+                "includes": JSON.stringify(includes)
+            };
+
+            var csrf_token = " {{ csrf_token() }} ";
+
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+
+            $.ajax({
+                type: 'post',
+                url: '/create_case',
+                data: JSON.stringify(test),
+                contentType: "application/json",
+                success: function (res) {
+                    console.log('create_success')
+                    window.location.href = "/cases";
+                },
+                error: function (res) {
+                    //通过js 打印查看 res .
+                    myAlert(res.responseJSON.msg);
+                }
+            });
+        })
+
+        // 添加
+        $('#case').on('change', function () {
+            if ($('#case').val() !== '请选择') {
+                var case_id = $('#case option:selected').val();
+                console.log(case_id);
+                var case_name = $('#case option:selected').text();
+                var href = "<li id=" + case_id + "><a href='/api/edit_case/" + case_id + "/' id = " + case_id + ">" + case_name + "" +
+                    "</a><i class=\"js-remove\" onclick=remove_self('#" + case_id + "')>✖</i></li>";
+                $("#pre_case").append(href);
+            }
+        });
+
+        // 删除元素
+        function remove_self(id) {
+            $(id).remove();
+        };
+
+        function load_module(e, target) {
+            var p_id = e.value;
+            // p_id 项目下所有可用的接口
+            $.ajax({
+                url: "/modules_by_project/"+p_id,
+                success: function (res) {
+                    console.log(res);
+                    if (res.data) {
+                        // dom, 增加 html
+                        show_module(res.data, target);
+                    }
+                },
+                fail: function () {
+                    alert('项目不正确')
+                }
+            })
+        }
+
+        function load_case(e, target) {
+            var p_id = e.value;
+            $.ajax({
+                url: "/cases_by_module/"+p_id,
+                success: function (res) {
+                    console.log(res);
+                    if (res.data) {
+                        show_module(res.data, target);
+                    }
+                },
+                fail: function () {
+                    alert('项目不正确')
+                }
+            })
+        }
+
+        function show_module( data, e_id) {
+            // e_id 就是 select id #select_id
+            $(e_id).empty();
+            var option = '<option value="0">' + '全部' + '</option>'
+            $(e_id).append(option);
+            for (i=0; i < data.length; i++ ) {
+                var option = '<option value="' + data[i]['id'] + '">' + data[i]['name'] + '</option>'
+                $(e_id).append(option);
+            }
+        }
+    </script>
+{% endblock %}
