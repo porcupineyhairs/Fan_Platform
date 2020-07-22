@@ -1,19 +1,19 @@
-import datetime
+caseApis = [
+    {"method": "101", "url": "https://douban.uieee.com/v2/book/search?q=旅行&count=1", "account": "-1", "interval": "0",
+     "params": [{"name": "q", "value": "旅行"}, {"name": "count", "value": "1"}], "header": [],
+     "body": {"type": "101", "value": "{}"},
+     "verify": {"type": "102", "value": [{"name": "$.count", "value": "1", "mode": "101"}]},
+     "extract": {"type": "101", "value": [{"name": "count", "value": "$.count"}]}},
+    {"method": "101", "url": "https://douban.uieee.com/v2/book/search?q=旅行&count={{count}}", "account": "-1",
+     "interval": "0", "params": [{"name": "q", "value": "旅行"}, {"name": "count", "value": "{{count}}"}], "header": [],
+     "body": {"type": "102", "value": [{"name": "aa", "value": "22", "type": "text"}]},
+     "verify": {"type": "102", "value": [{"name": "", "value": "", "mode": "101"}]},
+     "extract": {"type": "101", "value": []}}]
 
-a = {'ENV': 'production', 'DEBUG': True, 'TESTING': False, 'PROPAGATE_EXCEPTIONS': None,
-     'PRESERVE_CONTEXT_ON_EXCEPTION': None, 'SECRET_KEY': 'hard to guess string',
-     'PERMANENT_SESSION_LIFETIME': datetime.timedelta(31), 'USE_X_SENDFILE': False, 'SERVER_NAME': None,
-     'APPLICATION_ROOT': '/', 'SESSION_COOKIE_NAME': 'session', 'SESSION_COOKIE_DOMAIN': None,
-     'SESSION_COOKIE_PATH': None, 'SESSION_COOKIE_HTTPONLY': True, 'SESSION_COOKIE_SECURE': False,
-     'SESSION_COOKIE_SAMESITE': None, 'SESSION_REFRESH_EACH_REQUEST': True, 'MAX_CONTENT_LENGTH': None,
-     'SEND_FILE_MAX_AGE_DEFAULT': datetime.timedelta(0, 43200), 'TRAP_BAD_REQUEST_ERRORS': None,
-     'TRAP_HTTP_EXCEPTIONS': False, 'EXPLAIN_TEMPLATE_LOADING': False, 'PREFERRED_URL_SCHEME': 'http',
-     'JSON_AS_ASCII': False, 'JSON_SORT_KEYS': True, 'JSONIFY_PRETTYPRINT_REGULAR': False,
-     'JSONIFY_MIMETYPE': 'application/json', 'TEMPLATES_AUTO_RELOAD': None, 'MAX_COOKIE_SIZE': 4093,
-     'SQLALCHEMY_COMMIT_ON_TEARDOWN': True,
-     'SQLALCHEMY_DATABASE_URI': 'sqlite:////home/mi/PycharmProjects/Fan_Platform/comments/data-dev.sqlite',
-     'SQLALCHEMY_TRACK_MODIFICATIONS': False, 'SQLALCHEMY_BINDS': None, 'SQLALCHEMY_NATIVE_UNICODE': None,
-     'SQLALCHEMY_ECHO': False, 'SQLALCHEMY_RECORD_QUERIES': None, 'SQLALCHEMY_POOL_SIZE': None,
-     'SQLALCHEMY_POOL_TIMEOUT': None, 'SQLALCHEMY_POOL_RECYCLE': None, 'SQLALCHEMY_MAX_OVERFLOW': None,
-     'SQLALCHEMY_ENGINE_OPTIONS': {}}
-print(a)
+caseDesc = ""
+caseName = "豆瓣test"
+caseType = "200"
+id = 3673
+moduleId = 127
+moduleType = 100
+updateBy = "v-caoyongqi"

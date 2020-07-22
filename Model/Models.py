@@ -42,7 +42,6 @@ class Base(db.Model):
             log.exception(e)
             db.session.rollback()
 
-
     def delete(self):
         self.status = self.DELETE_STATUS
         try:
@@ -159,7 +158,6 @@ class Module(Base):
         self.module_name = name
         self.project_id = pid
 
-
     def delete(self):
         self.status = self.DELETE_STATUS
         try:
@@ -169,7 +167,6 @@ class Module(Base):
         except Exception as e:
             log.exception(e)
             db.session.rollback()
-
 
     @property
     def case_records(self):
@@ -186,7 +183,11 @@ class Case(Base):
     name = db.Column(db.String(32), nullable=False, comment="用例名称")
     include = db.Column(db.String(512), comment="可能存在子用例")
     request = db.Column(db.TEXT, comment="测试数据")
+
+
     module_id = db.Column(db.INT, db.ForeignKey("module.id"), comment="用例的接口")
+    author = db.Column(db.String(32),default="",comment="创建者")
+
 
     def __repr__(self):
         return f"name:{self.name}"
