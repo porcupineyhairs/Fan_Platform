@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Fan_Platform.iml" filepath="$PROJECT_DIR$/.idea/Fan_Platform.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Downloads/_data/.idea/_data.iml" filepath="$PROJECT_DIR$/../Downloads/_data/.idea/_data.iml" />
     </modules>
   </component>
 </project>

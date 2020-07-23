@@ -1,0 +1,36 @@
+2020-07-23 15:25:36,692 - App.Api.envOpt - ERROR - 'NoneType' object has no attribute 'id'
+Traceback (most recent call last):
+  File "/home/mi/Fan_Platform/App/Api/envOpt.py", line 35, in post
+    return jsonify(dict(code=0, data=f"{e.id}", msg="ok"))
+AttributeError: 'NoneType' object has no attribute 'id'
+2020-07-23 15:35:47,386 - App.Api.envOpt - ERROR - type object 'Envs' has no attribute 'quert'
+Traceback (most recent call last):
+  File "/home/mi/Fan_Platform/App/Api/envOpt.py", line 55, in put
+    if Envs.quert.filter(Envs.base_url == url).first():
+AttributeError: type object 'Envs' has no attribute 'quert'
+2020-07-23 15:40:05,794 - App.Api.envOpt - ERROR - 406 Not Acceptable: id已刪除
+Traceback (most recent call last):
+  File "/home/mi/Fan_Platform/App/Api/envOpt.py", line 89, in delete
+    e = Envs.get(id)
+  File "/home/mi/Fan_Platform/Model/Models.py", line 35, in get
+    return cls.query.get_or_NoFound(id)
+  File "/home/mi/Fan_Platform/comments/MyBaseQueryOpt.py", line 29, in get_or_NoFound
+    abort(406, err_msg)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 822, in abort
+    return _aborter(status, *args, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.NotAcceptable: 406 Not Acceptable: id已刪除
+2020-07-23 15:41:07,075 - App.Api.envOpt - ERROR - 410 Gone: id已刪除
+Traceback (most recent call last):
+  File "/home/mi/Fan_Platform/App/Api/envOpt.py", line 89, in delete
+    e = Envs.get(id)
+  File "/home/mi/Fan_Platform/Model/Models.py", line 35, in get
+    return cls.query.get_or_NoFound(id)
+  File "/home/mi/Fan_Platform/comments/MyBaseQueryOpt.py", line 29, in get_or_NoFound
+    abort(410, err_msg)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 822, in abort
+    return _aborter(status, *args, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/werkzeug/exceptions.py", line 807, in __call__
+    raise self.mapping[code](*args, **kwargs)
+werkzeug.exceptions.Gone: 410 Gone: id已刪除

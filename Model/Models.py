@@ -34,6 +34,10 @@ class Base(db.Model):
     def get(cls, id):
         return cls.query.get_or_NoFound(id)
 
+
+
+
+
     def save(self):
         try:
             db.session.add(self)
@@ -120,7 +124,9 @@ class Project(Base):
     __tablename__ = "project"
     project_name = db.Column(db.String(32), nullable=False, default="", unique=True)
     project_desc = db.Column(db.String(500), nullable=False, default="")
-    module = db.relationship("Module", backref="project", lazy='dynamic')
+
+    interface = db.relationship("Interfaces", backref="project_interface", lazy='dynamic')
+    debugtalk = db.relationship("DebugTalks", backref='project_debugtalk', uselist=False)
 
     def __init__(self, name, desc):
         self.project_desc = desc
@@ -132,30 +138,46 @@ class Project(Base):
     def delete(self):
         self.status = self.DELETE_STATUS
         # 级联修改状态
-        for module in self.module_records:
-            module.status = self.DELETE_STATUS
-            for case in module.case_records:
+        for interface in self.interfaces_records:
+            interface.status = self.DELETE_STATUS
+            for case in interface.case_records:
                 case.status = self.DELETE_STATUS
         db.session.commit()
 
+    @property
+    def debugtalk_records(self):
+        return self.debugtalks.filter_by().first()
+
     # 添加一个动态属性
     @property
-    def module_records(self):
-        return self.module.filter_by().all()
+    def interfaces_records(self):
+        return self.interface.filter_by().all()
+
+
+# debugtalks
+class DebugTalks(Base):
+    __tablename__ = 'debugtalks'
+    name = db.Column(db.String(200), default="debugtalk.py", comment="debugtalk文件名称")
+    debugtalks = db.Column(db.TEXT, nullable=True, default='#debugtalk.py', comment='debugtalk.py文件')
+    project = db.Column(db.Integer, db.ForeignKey("project.id"))
+
+    def __repr__(self):
+        return f"{self.id}"
 
 
 # 接口
-class Module(Base):
-    __tablename__ = "module"
-    module_name = db.Column(db.String(32), nullable=False, comment="接口名")
-    module_desc = db.Column(db.String(500), default="")
+class Interfaces(Base):
+    __tablename__ = "interfaces"
+    interface_name = db.Column(db.String(32), nullable=False, comment="接口名")
+    interface_desc = db.Column(db.String(500), default="", comment='描述')
+    tester = db.Column(db.String(32), comment='测试人')
 
     project_id = db.Column(db.INT, db.ForeignKey("project.id"))
-    case = db.relationship("Case", backref="module", lazy="dynamic")
+    case = db.relationship("Case", backref="interface", lazy="dynamic")
 
     def __init__(self, name, desc, pid):
-        self.module_desc = desc
-        self.module_name = name
+        self.interface_desc = desc
+        self.interface_name = name
         self.project_id = pid
 
     def delete(self):
@@ -176,6 +198,34 @@ class Module(Base):
         return f"module_name:{self.module_name}"
 
 
+# 環境
+class Envs(Base):
+    __tablename__ = 'envs'
+    name = db.Column(db.String(200), unique=True, comment="测试环境名称")
+    base_url = db.Column(db.String(200), comment="请求URL")
+    desc = db.Column(db.String(200), nullable=True, default="")
+
+    def delete(self):
+        self.status = self.DELETE_STATUS
+        try:
+            self.status = self.DELETE_STATUS
+            db.session.commit()
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+
+
+
+    def __init__(self, name, url, desc):
+        self.name = name
+        self.base_url = url
+        self.desc = desc
+
+    def __repr__(self):
+        return f"name:{self.name}"
+
+
+
 # 用例
 class Case(Base):
     __tablename__ = "case"
@@ -184,10 +234,21 @@ class Case(Base):
     include = db.Column(db.String(512), comment="可能存在子用例")
     request = db.Column(db.TEXT, comment="测试数据")
 
+    interface_id = db.Column(db.INT, db.ForeignKey("interfaces.id"), comment="用例的接口")
+    author = db.Column(db.String(32), default="", comment="创建者")
 
-    module_id = db.Column(db.INT, db.ForeignKey("module.id"), comment="用例的接口")
-    author = db.Column(db.String(32),default="",comment="创建者")
+    def __repr__(self):
+        return f"name:{self.name}"
 
+
+class Report(Base):
+    __tablename__ = "report"
+    name = db.Column(db.String(200), unique=True, comment="测试报告")
+    result = db.Column(db.Boolean, default=False, comment="测试结果")
+    count = db.Column(db.Integer, nullable=True, comment="用例数")
+    success = db.Column(db.Integer, nullable=True, comment="成功数")
+    html = db.Column(db.TEXT, default="", comment="报告html")
+    summary = db.Column(db.TEXT, default="", comment="报告详情")
 
     def __repr__(self):
         return f"name:{self.name}"

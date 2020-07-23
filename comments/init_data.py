@@ -22,9 +22,10 @@ def add_project(nums: int):
         p = Project(name=f"{f.company()}", desc=f"{f.word()}")
         db.session.add(p)
     db.session.commit()
+    print('ok')
 
 
-def add_user(nums: int, superUser: bool):
+def add_user(nums: int, superUser: bool = False):
     """
     增加测试用户
     """
@@ -54,16 +55,17 @@ def add_part(nums: int):
         db.session.add(p)
     db.session.commit()
 
-def add_module(nums:int):
-    """增加接口"""
 
+def add_Interface(nums: int):
+    """增加接口"""
 
     create_app().app_context().push()
 
     for i in range(nums):
-        p = Module(name=f.job(),desc=f.pystr(),pid=1)
+        p = Interfaces(name=f.job(), desc=f.pystr(), pid=1)
         db.session.add(p)
     db.session.commit()
 
+
 if __name__ == '__main__':
-    add_module(nums=10)
+    add_Interface(nums=2)

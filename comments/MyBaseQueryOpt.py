@@ -26,6 +26,6 @@ class MyBaseQuery(BaseQuery):
             abort(406, err_msg)
         if rv.status == 0:
             err_msg = "id已刪除"
-            abort(406, err_msg)
+            abort(410, err_msg)
 
         return rv
