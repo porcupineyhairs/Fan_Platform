@@ -67,5 +67,11 @@ def add_Interface(nums: int):
     db.session.commit()
 
 
+def add_Case():
+    create_app().app_context().push()
+
+    Case(name="图灵", request="test").save()
+
+
 if __name__ == '__main__':
-    add_Interface(nums=2)
+    add_Case()

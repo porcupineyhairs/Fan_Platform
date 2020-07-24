@@ -8,6 +8,7 @@ import time
 
 import jwt
 from flask import current_app
+from flask_restful import abort
 from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -19,7 +20,6 @@ log = get_log(__name__)
 
 class Base(db.Model):
     DELETE_STATUS = 0
-
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     create_time = db.Column(db.Integer, default=int(time.time()))
@@ -33,10 +33,6 @@ class Base(db.Model):
     @classmethod
     def get(cls, id):
         return cls.query.get_or_NoFound(id)
-
-
-
-
 
     def save(self):
         try:
@@ -126,6 +122,7 @@ class Project(Base):
     project_desc = db.Column(db.String(500), nullable=False, default="")
 
     interface = db.relationship("Interfaces", backref="project_interface", lazy='dynamic')
+    case = db.relationship('Case', backref="project_case", lazy='dynamic')
     debugtalk = db.relationship("DebugTalks", backref='project_debugtalk', uselist=False)
 
     def __init__(self, name, desc):
@@ -134,6 +131,18 @@ class Project(Base):
 
     def __repr__(self):
         return f"project_name:{self.project_name}"
+
+    @classmethod
+    def assertIdExisted(cls, id):
+        p = cls.query.get(id)
+        if not p or p.status == 0:
+            abort(400, code=1, data="", err="projectId 不存在或删除")
+
+    @classmethod
+    def assertName(cle, name):
+        res = cle.query.filter_by(project_name=name).first()
+        if res:
+            abort(400, code=1, data="", err=f"projectName 重复!")
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -144,11 +153,12 @@ class Project(Base):
                 case.status = self.DELETE_STATUS
         db.session.commit()
 
+    # debugtalk
     @property
     def debugtalk_records(self):
         return self.debugtalks.filter_by().first()
 
-    # 添加一个动态属性
+    # interfaces动态属性
     @property
     def interfaces_records(self):
         return self.interface.filter_by().all()
@@ -180,6 +190,18 @@ class Interfaces(Base):
         self.interface_name = name
         self.project_id = pid
 
+    @classmethod
+    def assertName(cle, name):
+        res = cle.query.filter_by(interface_name=name).first()
+        if res:
+            abort(400, code=1, data="", err=f"interface_name 重复!")
+
+    @classmethod
+    def assertIdExisted(cls, id):
+        p = cls.query.get(id)
+        if not p or p.status == 0:
+            abort(400, code=1, data="", err="interface 不存在或删除")
+
     def delete(self):
         self.status = self.DELETE_STATUS
         try:
@@ -195,7 +217,7 @@ class Interfaces(Base):
         return self.case.filter_by().all()
 
     def __repr__(self):
-        return f"module_name:{self.module_name}"
+        return f"Interfaces:{self.interface_name}"
 
 
 # 環境
@@ -204,6 +226,13 @@ class Envs(Base):
     name = db.Column(db.String(200), unique=True, comment="测试环境名称")
     base_url = db.Column(db.String(200), comment="请求URL")
     desc = db.Column(db.String(200), nullable=True, default="")
+
+    @classmethod
+    def assertIdExisted(cls, id):
+        p = cls.query.get_or_NoFound(id)
+        if not p or p.status == 0:
+            abort(400, code=1, data="", err="envId 不存在或删除")
+        return p
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -214,8 +243,6 @@ class Envs(Base):
             log.exception(e)
             db.session.rollback()
 
-
-
     def __init__(self, name, url, desc):
         self.name = name
         self.base_url = url
@@ -225,17 +252,41 @@ class Envs(Base):
         return f"name:{self.name}"
 
 
-
 # 用例
 class Case(Base):
     __tablename__ = "case"
     type = db.Column(db.SmallInteger, default=1, comment="做扩展")
-    name = db.Column(db.String(32), nullable=False, comment="用例名称")
-    include = db.Column(db.String(512), comment="可能存在子用例")
+    name = db.Column(db.String(32), nullable=False, unique=True, comment="用例名称")
+    desc = db.Column(db.String(32), nullable=True, comment="desc")
     request = db.Column(db.TEXT, comment="测试数据")
 
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), comment="用例項目")
     interface_id = db.Column(db.INT, db.ForeignKey("interfaces.id"), comment="用例的接口")
     author = db.Column(db.String(32), default="", comment="创建者")
+
+    def __init__(self, name, request, pid=None, interface_id=None, author=None, desc=None):
+        self.name = name
+        self.request = request
+        self.desc = desc
+        self.author = author
+        self.interface_id = interface_id
+        self.project_id = pid
+
+    @property
+    def getInterfaceInfo(self):
+        interface = Interfaces.query.get(self.interface_id)
+        return interface
+
+    @property
+    def getProjectInfo(self):
+        p = Project.query.get(self.project_id)
+        return p
+
+    @classmethod
+    def assertName(cls, name):
+        res = cls.query.filter_by(name=name).first()
+        if res:
+            abort(400, code=1, data="", err=f"caseName 重复!")
 
     def __repr__(self):
         return f"name:{self.name}"
