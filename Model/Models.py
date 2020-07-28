@@ -264,9 +264,10 @@ class Case(Base):
     interface_id = db.Column(db.INT, db.ForeignKey("interfaces.id"), comment="用例的接口")
     author = db.Column(db.String(32), default="", comment="创建者")
 
-    def __init__(self, name, request, pid=None, interface_id=None, author=None, desc=None):
+    def __init__(self, name, request, pid=None, project_id=None, interface_id=None, author=None, desc=None):
         self.name = name
         self.request = request
+        self.project_id = project_id
         self.desc = desc
         self.author = author
         self.interface_id = interface_id

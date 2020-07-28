@@ -34,8 +34,11 @@ class CaseOpt(Resource):
             data = {
                 "code": 0,
                 "msg": "ok",
-                "data": [{"id": i.id, "status": i.status, "name": i.name, "desc": i.desc, "request":json.loads(i.request),
-                          "project_id": i.project_id,"interface_id":i.interface_id } for i in case]}
+                "data": [
+                    {"id": i.id, "status": i.status,"author":i.author, "name": i.name, "desc": i.desc, "request":
+                        json.loads(
+                        i.request),
+                     "project_id": i.project_id, "interface_id": i.interface_id} for i in case]}
 
             return jsonify(data)
 
@@ -68,7 +71,7 @@ class CaseOpt(Resource):
         if not caseSteps:
             return jsonify(dict(code=1, data="", err="caseSteps 不能为空"))
 
-        #参数处理
+        # 参数处理
         for step in caseSteps:
             step['stepHeaders'] = par.body_to_dict(step['stepHeaders'])
             step['stepJson'] = par.body_to_dict(step['stepJson'])
@@ -78,7 +81,9 @@ class CaseOpt(Resource):
         caseSteps = json.dumps(caseSteps, ensure_ascii=False)
 
         try:
-            case = Case(name=caseName, desc=caseDesc, request=caseSteps, interface_id=caseInterfaceId, author=user)
+            case = Case(name=caseName, desc=caseDesc, request=caseSteps, interface_id=caseInterfaceId,
+                        project_id=caseProjectId,
+                        author=user)
             case.save()
             return jsonify(dict(code=0, data=case.id, msg='ok'))
 
@@ -94,10 +99,10 @@ class CaseOpt(Resource):
         par = CaseParseOpt()
         user = g.user.username
         parse = reqparse.RequestParser(argument_class=MyArgument)
-        parse.add_argument("caseId",type=int,required=True,help="caseId 不能为空")
+        parse.add_argument("caseId", type=int, required=True, help="caseId 不能为空")
         parse.add_argument("caseName", type=str, required=True, help="caseName 不能为空")
         parse.add_argument("caseDesc", type=str, default="")
-        caseId   = parse.parse_args().get('caseId')
+        caseId = parse.parse_args().get('caseId')
         caseName = parse.parse_args().get("caseName")
         caseDesc = parse.parse_args().get("caseDesc")
         # 判断是否重复
@@ -138,7 +143,7 @@ class CaseOpt(Resource):
         user = g.user.username
         parse = reqparse.RequestParser(argument_class=MyArgument)
         parse.add_argument("caseId", type=int, required=True, help="caseId 不能为空")
-        caseId   = parse.parse_args().get('caseId')
+        caseId = parse.parse_args().get('caseId')
 
         try:
             Case.get(caseId).delete()
@@ -172,7 +177,7 @@ class RunCase(Resource):
         caseSteps = case.request
         # do = Runner(caseName=caseName, caseSteps=caseSteps, env=env).setParams()
         do = CaseGenerateOpt()
-        do.generateCaseFile(caseInfo=case,casePath=get_cwd(),env=env)
+        do.generateCaseFile(caseInfo=case, casePath=get_cwd(), env=env)
         do.run()
         return "ok"
 
