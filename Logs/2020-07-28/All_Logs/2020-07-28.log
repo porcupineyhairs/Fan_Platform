@@ -27,3 +27,12 @@ Traceback (most recent call last):
   File "/usr/lib/python3.6/http/client.py", line 171, in _encode
     (name.title(), data[err.start:err.end], name)) from None
 UnicodeEncodeError: 'latin-1' codec can't encode characters in position 53-59: Body ('今天天气怎么样') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded in UTF-8.
+2020-07-28 22:28:12,152 - App.Api.caseOpt - ERROR - 'str' object has no attribute 'items'
+Traceback (most recent call last):
+  File "C:\Users\fanhonglian\Desktop\Fan_Platform\App\Api\caseOpt.py", line 40, in get
+    "project_id": i.project_id,"interface_id":i.interface_id } for i in case]}
+  File "C:\Users\fanhonglian\Desktop\Fan_Platform\App\Api\caseOpt.py", line 40, in <listcomp>
+    "project_id": i.project_id,"interface_id":i.interface_id } for i in case]}
+  File "C:\Users\fanhonglian\Desktop\Fan_Platform\comments\caseParseOpt.py", line 47, in dict_to_body
+    for k, v in a.items():
+AttributeError: 'str' object has no attribute 'items'

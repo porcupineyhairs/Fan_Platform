@@ -9,6 +9,7 @@ import json
 from flask import request, jsonify, g
 from flask_restful import Api, Resource, reqparse
 
+from App.Api.errors_and_auth import is_admin
 from Model.Models import Case, Interfaces, Envs, Project
 from comments.MyRequest import MyArgument
 from comments.caseParseOpt import CaseParseOpt
@@ -23,7 +24,24 @@ class CaseOpt(Resource):
 
     @auth.login_required
     def get(self):
-        pass
+        caseId = request.args.get("caseId")
+        try:
+            if caseId:
+                case = [Case.get(caseId)]
+            else:
+                case = Case.all()
+
+            data = {
+                "code": 0,
+                "msg": "ok",
+                "data": [{"id": i.id, "status": i.status, "name": i.name, "desc": i.desc, "request":json.loads(i.request),
+                          "project_id": i.project_id,"interface_id":i.interface_id } for i in case]}
+
+            return jsonify(data)
+
+        except Exception as e:
+            log.exception(e)
+            return jsonify(dict(code=1, data="", err=f"错误:{str(e)}"))
 
     @auth.login_required
     def post(self):
@@ -73,11 +91,64 @@ class CaseOpt(Resource):
 
     @auth.login_required
     def put(self):
-        pass
+        par = CaseParseOpt()
+        user = g.user.username
+        parse = reqparse.RequestParser(argument_class=MyArgument)
+        parse.add_argument("caseId",type=int,required=True,help="caseId 不能为空")
+        parse.add_argument("caseName", type=str, required=True, help="caseName 不能为空")
+        parse.add_argument("caseDesc", type=str, default="")
+        caseId   = parse.parse_args().get('caseId')
+        caseName = parse.parse_args().get("caseName")
+        caseDesc = parse.parse_args().get("caseDesc")
+        # 判断是否重复
+        Case.assertName(caseName)
+
+        # 解析step
+        caseSteps = request.json.get('caseSteps')
+        if not caseSteps:
+            return jsonify(dict(code=1, data="", err="caseSteps 不能为空"))
+
+        # 参数处理
+        for step in caseSteps:
+            step['stepHeaders'] = par.body_to_dict(step['stepHeaders'])
+            step['stepJson'] = par.body_to_dict(step['stepJson'])
+            step['stepParams'] = par.body_to_dict(step['stepParams'])
+            step['stepValidate'] = par.validate_to_dict(step['stepValidate'])
+
+        caseSteps = json.dumps(caseSteps, ensure_ascii=False)
+
+        try:
+            case = Case.get(caseId)
+            case.name = caseName
+            case.desc = caseDesc
+            case.request = caseSteps
+            case.save()
+            return jsonify(dict(code=0, data=case.id, msg='ok'))
+
+        except Exception as e:
+            db.session.rollback()
+            log.exception(e)
+            return jsonify(dict(code=1, data="", err=f"{e}"))
+        finally:
+            db.session.close()
 
     @auth.login_required
+    @is_admin
     def delete(self):
-        pass
+        user = g.user.username
+        parse = reqparse.RequestParser(argument_class=MyArgument)
+        parse.add_argument("caseId", type=int, required=True, help="caseId 不能为空")
+        caseId   = parse.parse_args().get('caseId')
+
+        try:
+            Case.get(caseId).delete()
+            return jsonify(dict(code=0, data="", msg='ok'))
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+            return jsonify(dict(code=1, err=f"错误:{str(e)}"))
+        finally:
+            db.session.close()
 
 
 class RunCase(Resource):
@@ -94,17 +165,15 @@ class RunCase(Resource):
         env = Envs.get(envId)
         case = Case.get(caseId)
 
-        from comments.htrunner import Runner
         from comments.caseGenerate import CaseGenerateOpt
         from suite.pwd import get_cwd
 
-        # do = DelCase(caseInfo=case.request)
-        # do.run()
         caseName = case.name
         caseSteps = case.request
         # do = Runner(caseName=caseName, caseSteps=caseSteps, env=env).setParams()
-        do = CaseGenerateOpt().generateCaseFile(caseInfo=case,casePath=get_cwd(),env=env)
-
+        do = CaseGenerateOpt()
+        do.generateCaseFile(caseInfo=case,casePath=get_cwd(),env=env)
+        do.run()
         return "ok"
 
 
