@@ -1,0 +1,24 @@
+{
+	"caseName":"图灵14",
+	"caseDesc":"图灵图灵图灵图灵图灵图灵图灵图灵",
+	"caseInterfaceId":1,
+	"caseProjectId":1,
+	"caseSteps":[
+		{
+			"stepName":"图灵接口测试",
+			"stepDesc":"step_desc",
+			"stepUrl":"http://www.tuling123.com/openapi/api",
+			"stepMethod":"POST",
+			"stepHeaders":[{"key":"Content-Type","val":"application/json"}],
+			"stepJson":[{"key": "key", "val": "8fe3b232710c4c0d87b761ed5301e7a4"}, {"key": "info", "val": "你叫什么"}, {"key": "userid", "val": "123456"}],
+			"stepParams":[],
+			"stepResponse": {"code":100000,"text":"我是棒棒哒图灵机器人"},
+			"stepValidate":[{"key":"status_code","val":200,"mode":"eq"},{"key":"body.text","val":"我是棒棒哒图灵机器人","mode":"eq"},{"key":"body.code","val":10000,"mode":"eq"}],
+			"stepValidate_script":["assert status_code == 200","'我是棒棒哒图灵机器人' = response_json.get('text')"],
+			"stepExtract":""
+		}
+		]
+}
+http://127.0.0.1:5000/api/caseOpt
+http://www.tuling123.com/openapi/api
+{"key": "8fe3b232710c4c0d87b761ed5301e7a4", "info":"你叫什么", "userid": "123456"}

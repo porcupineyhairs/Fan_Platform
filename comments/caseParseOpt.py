@@ -21,21 +21,40 @@ class CaseParseOpt:
         data = {}
         for kv in d:
             data[kv.get("key")] = kv.get('val')
+            if "mode" in kv:
+                data['mode'] = kv.get('mode')
+
         return data
 
-    def dict_to_body(self, a: dict):
+    def validate_to_dict(self, d: list) -> list:
+        """
+         [{"key": "status_code", "val": 200, "mode": "eq"}, {"key": "body.text", "val": "我是棒棒哒图灵机器人", "mode": "eq"},
+         {"key": "code", "val": 10000, "mode": "eq"}]
 
+         [{"eq":["status_code",200]}]
+        """
+        l = []
+
+        for kv in  d:
+            data = {}
+            data[kv['mode']] =[kv.get("key"),kv.get('val')]
+            l.append(data)
+        return l
+
+
+    def dict_to_body(self, a: dict):
         data = []
         for k, v in a.items():
             d = dict(key=k, val=v)
             data.append(d)
-        return data
+        return json.dumps(data, ensure_ascii=False)
 
 
 if __name__ == '__main__':
     d = [{"key": "key", "val": "8fe3b232710c4c0d87b761ed5301e7a4"}, {"key": "info", "val": "今天天气怎么样"},
          {"key": "loc", "val": "北京中关村"}, {"key": "userid", "val": "123456"}]
-    b = {'key': '8fe3b232710c4c0d87b761ed5301e7a4', 'info': '今天天气怎么样', 'loc': '北京中关村', 'userid': '123456'}
-
-    CaseParseOpt().body_to_dict(d)
-    CaseParseOpt().dict_to_body(b)
+    b = {"key": "8fe3b232710c4c0d87b761ed5301e7a4", "info": "你叫什么", "userid": "123456"}
+    g = [{"key": "status_code", "val": 200, "mode": "eq"}, {"key": "body.text", "val": "我是棒棒哒图灵机器人", "mode": "eq"},
+         {"key": "code", "val": 10000, "mode": "eq"}]
+    print(CaseParseOpt().validate_to_dict(g))
+    print(CaseParseOpt().dict_to_body(b))

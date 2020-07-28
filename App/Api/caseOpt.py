@@ -5,19 +5,17 @@
 @desc: 测试用例接口
 """
 import json
-import os
-from datetime import datetime
 
 from flask import request, jsonify, g
 from flask_restful import Api, Resource, reqparse
 
 from Model.Models import Case, Interfaces, Envs, Project
 from comments.MyRequest import MyArgument
-from comments.caseGenerate import CaseGenerateOpt
 from comments.caseParseOpt import CaseParseOpt
 from comments.log import get_log
 from . import v1
 from .. import auth, db
+
 log = get_log(__name__)
 
 
@@ -39,7 +37,7 @@ class CaseOpt(Resource):
         caseName = parse.parse_args().get("caseName")
         caseDesc = parse.parse_args().get("caseDesc")
         caseInterfaceId = parse.parse_args().get("caseInterfaceId")
-        caseProjectId= parse.parse_args().get("caseProjectId")
+        caseProjectId = parse.parse_args().get("caseProjectId")
         # 判断是否重复
         Case.assertName(caseName)
 
@@ -52,10 +50,13 @@ class CaseOpt(Resource):
         if not caseSteps:
             return jsonify(dict(code=1, data="", err="caseSteps 不能为空"))
 
+        #参数处理
         for step in caseSteps:
             step['stepHeaders'] = par.body_to_dict(step['stepHeaders'])
-            step['stepBody'] = par.body_to_dict(step['stepBody'])
-            step['stepRequest'] =  par.body_to_dict(step['stepRequest'])
+            step['stepJson'] = par.body_to_dict(step['stepJson'])
+            step['stepParams'] = par.body_to_dict(step['stepParams'])
+            step['stepValidate'] = par.validate_to_dict(step['stepValidate'])
+
         caseSteps = json.dumps(caseSteps, ensure_ascii=False)
 
         try:
@@ -83,24 +84,27 @@ class RunCase(Resource):
 
     @auth.login_required
     def post(self):
-        do = CaseGenerateOpt()
         par = CaseParseOpt()
         user = g.user.username
         caseId = request.json.get("caseId")
         envId = request.json.get("envId")
         if not caseId:
-            return jsonify(dict(code=1,data="",err="caseId 不能为空"))
+            return jsonify(dict(code=1, data="", err="caseId 不能为空"))
 
         env = Envs.get(envId)
         case = Case.get(caseId)
 
-
+        from comments.htrunner import Runner
+        from comments.caseGenerate import CaseGenerateOpt
         from suite.pwd import get_cwd
-        SUITES_DIR = get_cwd()
-        case_dir_path = os.path.join(SUITES_DIR,
-                                         datetime.strftime(datetime.now(), '%Y-%m-%d-%H-%M-%S-%f'))
 
-        do.generateCaseFile(caseInfo=case,casePath=case_dir_path,env=env)
+        # do = DelCase(caseInfo=case.request)
+        # do.run()
+        caseName = case.name
+        caseSteps = case.request
+        # do = Runner(caseName=caseName, caseSteps=caseSteps, env=env).setParams()
+        do = CaseGenerateOpt().generateCaseFile(caseInfo=case,casePath=get_cwd(),env=env)
+
         return "ok"
 
 

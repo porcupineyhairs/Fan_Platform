@@ -45,12 +45,15 @@ def get_log(logger_name):
     # 创建一个handler写入所有日志
     fh = logging.FileHandler(all_log_name)
     fh.setLevel(logging.INFO)
+
     # 创建一个handler写入错误日志
     eh = logging.FileHandler(error_log_name)
     eh.setLevel(logging.ERROR)
+
+
     # 创建一个handler输出到控制台
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.DEBUG)
 
     # 定义日志输出格式
     # 以时间-日志器名称-日志级别-日志内容的形式展示

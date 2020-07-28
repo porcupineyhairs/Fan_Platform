@@ -1,0 +1,25 @@
+2020-07-28 16:19:04,545 - comments.Request - ERROR - Request  - 89 - 'latin-1' codec can't encode characters in position 53-59: Body ('今天天气怎么样') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded in UTF-8.
+Traceback (most recent call last):
+  File "/home/mi/Fan_Platform/comments/Request.py", line 75, in testApi
+    data=json.dumps(self.req, ensure_ascii=False), timeout=100)
+  File "/home/mi/flask/lib/python3.6/site-packages/requests/api.py", line 119, in post
+    return request('post', url, data=data, json=json, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/requests/api.py", line 61, in request
+    return session.request(method=method, url=url, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/requests/sessions.py", line 530, in request
+    resp = self.send(prep, **send_kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/requests/sessions.py", line 643, in send
+    r = adapter.send(request, **kwargs)
+  File "/home/mi/flask/lib/python3.6/site-packages/requests/adapters.py", line 449, in send
+    timeout=timeout
+  File "/home/mi/flask/lib/python3.6/site-packages/urllib3/connectionpool.py", line 672, in urlopen
+    chunked=chunked,
+  File "/home/mi/flask/lib/python3.6/site-packages/urllib3/connectionpool.py", line 387, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "/usr/lib/python3.6/http/client.py", line 1264, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.6/http/client.py", line 1309, in _send_request
+    body = _encode(body, 'body')
+  File "/usr/lib/python3.6/http/client.py", line 171, in _encode
+    (name.title(), data[err.start:err.end], name)) from None
+UnicodeEncodeError: 'latin-1' codec can't encode characters in position 53-59: Body ('今天天气怎么样') is not valid Latin-1. Use body.encode('utf-8') if you want to send it encoded in UTF-8.
