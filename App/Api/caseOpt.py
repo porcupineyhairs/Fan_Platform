@@ -179,8 +179,8 @@ class RunCase(Resource):
         do = CaseGenerateOpt()
         do.generateCaseFile(caseInfo=case, casePath=get_cwd(), env=env)
         res = do.run()
-        # return jsonify(res)
-        return "ok"
+        return jsonify(res)
+        # return "ok"
 
 api_script = Api(v1)
 api_script.add_resource(CaseOpt, "/caseOpt")

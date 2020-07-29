@@ -40,8 +40,12 @@ class CaseGenerateOpt:
 
         for case in caseRequest:
             step['name'] = case['stepName']
-            step['request'] = dict(url=case['stepUrl'], method=case['stepMethod'], headers=case['stepHeaders'],
-                                   json=case['stepJson'], params=case['stepParams'])
+            req = dict(url=case['stepUrl'], method=case['stepMethod'], headers=case['stepHeaders'])
+            if case['stepJson']:
+                req['json'] =case['stepJson']
+            elif case['stepParams']:
+                req['params'] = case['stepParams']
+            step['request'] = req
             step['validate'] = [v for v in case['stepValidate']]
             teststeps.append(step)
 
@@ -82,9 +86,9 @@ class CaseGenerateOpt:
 
     def run(self):
         from .shllOpt import Shell
-        print(self.finallPath)
         self.runner.run_path(self.finallPath)
-        Shell.invoke(f" hrun {self.finallPath} --alluredir={self.caseDirPath}/my_allure_results")
-        # Shell.invoke(f"allure-2.9.0/bin/allure generate my_allure_results -o report/ --clean")
+        res = self.runner.get_summary().dict()
+        # Shell.invoke(f" hrun {self.finallPath} --alluredir={self.caseDirPath}/allure_results")
+        # Shell.invoke(f"allure-2.9.0\bin/allure generate {self.caseDirPath}/allure_results -o {self.caseDirPath}/report --clean")
         # print(res)
-        # return res
+        return res

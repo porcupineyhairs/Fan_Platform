@@ -28,6 +28,7 @@ class InterfacesOpt(Resource):
             return jsonify(dict(code=1, data="", err="缺少必传参数"))
         try:
             m = Interfaces(name=InterfacesName, pid=projectId, desc=InterfacesDesc)
+            m.save()
             return jsonify(dict(code=0, data=f"{m.id}", msg="ok"))
         except Exception as e:
             log.exception(e)
