@@ -9,7 +9,6 @@ import os
 
 import yaml
 from httprunner import HttpRunner
-
 from Model.Models import DebugTalks
 from comments.caseParseOpt import CaseParseOpt
 
@@ -18,14 +17,18 @@ par = CaseParseOpt()
 
 class CaseGenerateOpt:
 
+    def __init__(self):
+        self.runner = HttpRunner()
+
     def generateCaseFile(self, caseInfo, casePath: str, env):
+
         """
         生成目录 构建yml 测试用例
         """
         case_list = {}
-        config =  {
-                "name": caseInfo.name,
-                "base_url": env.base_url if env else ""
+        config = {
+            "name": caseInfo.name,
+            "base_url": env.base_url if env else ""
         }
         case_list['config'] = config
 
@@ -39,7 +42,7 @@ class CaseGenerateOpt:
             step['name'] = case['stepName']
             step['request'] = dict(url=case['stepUrl'], method=case['stepMethod'], headers=case['stepHeaders'],
                                    json=case['stepJson'], params=case['stepParams'])
-            step['validate'] = [v  for v in case['stepValidate']]
+            step['validate'] = [v for v in case['stepValidate']]
             teststeps.append(step)
 
         case_list['teststeps'] = teststeps
@@ -49,6 +52,8 @@ class CaseGenerateOpt:
         caseProjectId = caseInfo.project_id
         # caseName
         self.caseName = caseInfo.name
+        # caseId
+        self.runner.with_case_id(caseInfo.id)
 
         # 创建
         if not os.path.exists(casePath):
@@ -70,11 +75,16 @@ class CaseGenerateOpt:
         if not os.path.exists(self.caseDirPath):
             os.makedirs(self.caseDirPath)
 
-        self.finallPath = os.path.join(self.caseDirPath,self.caseName+'.yml')
+        self.finallPath = os.path.join(self.caseDirPath, self.caseName + '.yml')
         with open(os.path.join(self.finallPath),
                   mode="w", encoding="utf-8") as one_file:
             yaml.dump(case_list, one_file, allow_unicode=True)
 
     def run(self):
-        h =HttpRunner().run_path(self.finallPath)
-
+        from .shllOpt import Shell
+        print(self.finallPath)
+        self.runner.run_path(self.finallPath)
+        Shell.invoke(f" hrun {self.finallPath} --alluredir={self.caseDirPath}/my_allure_results")
+        # Shell.invoke(f"allure-2.9.0/bin/allure generate my_allure_results -o report/ --clean")
+        # print(res)
+        # return res

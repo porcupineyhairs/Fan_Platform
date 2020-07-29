@@ -1,0 +1,50 @@
+2020-07-29 10:51:58.257 | INFO     | httprunner.runner:test_start:451 - Start to run testcase: test, TestCase ID: ce900245-1efd-4b3f-9fcc-d492eaa60023
+2020-07-29 10:51:58.257 | INFO     | httprunner.runner:__run_step:292 - run step begin: 请求 >>>>>>
+2020-07-29 10:51:58.349 | DEBUG    | httprunner.client:request:186 - client IP: 10.221.194.148, Port: 45226
+2020-07-29 10:51:58.349 | DEBUG    | httprunner.client:request:194 - server IP: 47.95.179.180, Port: 80
+2020-07-29 10:51:58.351 | DEBUG    | httprunner.client:log_print:40 - 
+================== request details ==================
+method   : POST
+url      : http://www.tuling123.com/openapi/api
+headers  : {
+    "User-Agent": "python-requests/2.23.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "HRUN-Request-ID": "HRUN-ce900245-1efd-4b3f-9fcc-d492eaa60023-118258",
+    "Content-Length": "97"
+}
+cookies  : {}
+body     : {
+    "key": "8fe3b232710c4c0d87b761ed5301e7a4",
+    "info": "\u4f60\u53eb\u4ec0\u4e48",
+    "userid": 123456
+}
+
+2020-07-29 10:51:58.352 | DEBUG    | httprunner.client:log_print:40 - 
+================== response details ==================
+status_code : 200
+headers  : {
+    "Date": "Wed, 29 Jul 2020 02:51:58 GMT",
+    "Content-Type": "text/plain; charset=UTF-8",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Vary": "Accept-Encoding",
+    "globalId": "122613191836010168",
+    "Content-Encoding": "gzip"
+}
+cookies  : {}
+encoding : UTF-8
+content_type : text/plain; charset=UTF-8
+body     : {
+    "code": 100000,
+    "text": "\u6211\u662f\u68d2\u68d2\u54d2\u56fe\u7075\u673a\u5668\u4eba"
+}
+
+2020-07-29 10:51:58.353 | INFO     | httprunner.client:request:218 - status_code: 200, response_time(ms): 90.71 ms, response_length: 0 bytes
+2020-07-29 10:51:58.354 | INFO     | httprunner.response:validate:246 - assert status_code equal 200(int)	==> pass
+2020-07-29 10:51:58.355 | INFO     | httprunner.response:validate:246 - assert body.text equal 我是棒棒哒图灵机器人(str)	==> pass
+2020-07-29 10:51:58.355 | INFO     | httprunner.response:validate:246 - assert body.code equal 100000(int)	==> pass
+2020-07-29 10:51:58.356 | INFO     | httprunner.runner:__run_step:304 - run step end: 请求 <<<<<<
+

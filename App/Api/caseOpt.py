@@ -35,9 +35,9 @@ class CaseOpt(Resource):
                 "code": 0,
                 "msg": "ok",
                 "data": [
-                    {"id": i.id, "status": i.status,"author":i.author, "name": i.name, "desc": i.desc, "request":
+                    {"id": i.id, "status": i.status, "author": i.author, "name": i.name, "desc": i.desc, "request":
                         json.loads(
-                        i.request),
+                            i.request),
                      "project_id": i.project_id, "interface_id": i.interface_id} for i in case]}
 
             return jsonify(data)
@@ -178,9 +178,9 @@ class RunCase(Resource):
         # do = Runner(caseName=caseName, caseSteps=caseSteps, env=env).setParams()
         do = CaseGenerateOpt()
         do.generateCaseFile(caseInfo=case, casePath=get_cwd(), env=env)
-        do.run()
+        res = do.run()
+        # return jsonify(res)
         return "ok"
-
 
 api_script = Api(v1)
 api_script.add_resource(CaseOpt, "/caseOpt")
