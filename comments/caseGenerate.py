@@ -9,6 +9,7 @@ import os
 
 import yaml
 from httprunner import HttpRunner
+
 from Model.Models import DebugTalks
 from comments.caseParseOpt import CaseParseOpt
 
@@ -42,7 +43,7 @@ class CaseGenerateOpt:
             step['name'] = case['stepName']
             req = dict(url=case['stepUrl'], method=case['stepMethod'], headers=case['stepHeaders'])
             if case['stepJson']:
-                req['json'] =case['stepJson']
+                req['json'] = case['stepJson']
             elif case['stepParams']:
                 req['params'] = case['stepParams']
             step['request'] = req
@@ -87,8 +88,10 @@ class CaseGenerateOpt:
     def run(self):
         from .shllOpt import Shell
         self.runner.run_path(self.finallPath)
+        print(self.caseDirPath)
         res = self.runner.get_summary().dict()
         # Shell.invoke(f" hrun {self.finallPath} --alluredir={self.caseDirPath}/allure_results")
-        # Shell.invoke(f"allure-2.9.0\bin/allure generate {self.caseDirPath}/allure_results -o {self.caseDirPath}/report --clean")
+        shell = "allure-2.9.0/bin/allure generate /home/mi/Fan_Platform/suite/tesInterfaces/allure_results -o  /home/mi/Fan_Platform/suite/tesInterfaces/report  --clean"
+        Shell.invoke(shell)
         # print(res)
         return res

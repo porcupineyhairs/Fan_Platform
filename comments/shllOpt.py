@@ -11,4 +11,5 @@ class Shell:
 
 
 if __name__ == '__main__':
-    Shell.invoke("allure-2.9.0\bin\allure generate my_allure_results -o report --clean")
+    # Shell.invoke("allure-2.9.0/bin/allure generate /home/mi/Fan_Platform/suite/tesInterfaces/allure_results -o  report --clean")
+    Shell.invoke("allure-2.9.0/bin/allure serve /home/mi/Fan_Platform/suite/tesInterfaces/allure_results")

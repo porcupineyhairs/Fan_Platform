@@ -99,5 +99,29 @@ class ProjectOpt(Resource):
             return jsonify(dict(code=0, err=f"{e}"))
 
 
+class ProjectDel(Resource):
+
+    @auth.login_required
+    @is_admin
+    def post(self):
+        projectId = request.json.get('projectId')
+        if not projectId:
+            return jsonify(dict(code=1, err="projectId不能为空"))
+
+        try:
+            if isinstance(projectId, (str, int)):
+                Project.assertIdExisted(projectId).Delete()
+
+                return jsonify(dict(code=0, data="", msg="ok"))
+            elif isinstance(projectId, list):
+                for i in projectId:
+                    Project.assertIdExisted(i).Delete()
+                return jsonify(dict(code=0, data="", msg="ok"))
+        except Exception as e:
+            log.exception(e)
+            return jsonify(dict(code=0, err=f"{e}"))
+
+
 api_script = Api(v1)
 api_script.add_resource(ProjectOpt, "/projectOpt")
+api_script.add_resource(ProjectDel, "/delProject")

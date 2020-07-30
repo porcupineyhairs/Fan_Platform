@@ -27,6 +27,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
 
     CACHE_TYPE = 'simple'
+    ERROR_404_HELP = False
     CACHE_DEFAULT_TIMEOUT = 300
     # MAIL_SERVER = 'smtp.googlemail.com'
     # MAIL_PORT = 587

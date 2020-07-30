@@ -7,8 +7,7 @@
 import time
 
 import jwt
-from flask import current_app
-from flask_restful import abort
+from flask import current_app,abort
 from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -132,17 +131,31 @@ class Project(Base):
     def __repr__(self):
         return f"project_name:{self.project_name}"
 
+
+
     @classmethod
     def assertIdExisted(cls, id):
         p = cls.query.get(id)
-        if not p or p.status == 0:
-            abort(400, code=1, data="", err="projectId 不存在或删除")
+        if not p:
+            abort(400, f"projectId {id} 不存在或删除")
+        return p
 
     @classmethod
     def assertName(cle, name):
         res = cle.query.filter_by(project_name=name).first()
         if res:
-            abort(400, code=1, data="", err=f"projectName 重复!")
+            abort(400, "projectName 重复!")
+
+
+    def Delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+
+
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -194,13 +207,13 @@ class Interfaces(Base):
     def assertName(cle, name):
         res = cle.query.filter_by(interface_name=name).first()
         if res:
-            abort(400, code=1, data="", err=f"interface_name 重复!")
+            abort(400, f"interface_name 重复!")
 
     @classmethod
     def assertIdExisted(cls, id):
         p = cls.query.get(id)
         if not p or p.status == 0:
-            abort(400, code=1, data="", err="interface 不存在或删除")
+            abort(400, "interface 不存在或删除")
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -231,7 +244,7 @@ class Envs(Base):
     def assertIdExisted(cls, id):
         p = cls.query.get_or_NoFound(id)
         if not p or p.status == 0:
-            abort(400, code=1, data="", err="envId 不存在或删除")
+            abort(400, "envId 不存在或删除")
         return p
 
     def delete(self):
@@ -287,7 +300,7 @@ class Case(Base):
     def assertName(cls, name):
         res = cls.query.filter_by(name=name).first()
         if res:
-            abort(400, code=1, data="", err=f"caseName 重复!")
+            abort(400, "caseName 重复!")
 
     def __repr__(self):
         return f"name:{self.name}"
