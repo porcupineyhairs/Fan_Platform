@@ -7,7 +7,7 @@
 import time
 
 import jwt
-from flask import current_app,abort
+from flask import current_app, abort
 from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -30,6 +30,12 @@ class Base(db.Model):
         return cls.query.filter_by().order_by(desc(cls.id)).all()
 
     @classmethod
+    def assertName(cls, name):
+        res = cls.query.filter_by(name=name).first()
+        if res:
+            abort(400, f"已存在  {name}!")
+
+    @classmethod
     def get(cls, id):
         return cls.query.get_or_NoFound(id)
 
@@ -40,6 +46,16 @@ class Base(db.Model):
         except Exception as e:
             log.exception(e)
             db.session.rollback()
+            abort(500, f"err:{e}")
+
+    def Delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+            abort(500, f"err:{e}")
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -47,6 +63,7 @@ class Base(db.Model):
             db.session.commit()
         except Exception as e:
             log.exception(e)
+            abort(500, f"err:{e}")
 
 
 # 用戶
@@ -122,6 +139,8 @@ class Project(Base):
 
     interface = db.relationship("Interfaces", backref="project_interface", lazy='dynamic')
     case = db.relationship('Case', backref="project_case", lazy='dynamic')
+    ucase = db.relationship("UICase", backref='project_ucase', lazy='dynamic')
+    method = db.relationship("UMethod", backref='project_method', lazy='dynamic')
     debugtalk = db.relationship("DebugTalks", backref='project_debugtalk', uselist=False)
 
     def __init__(self, name, desc):
@@ -130,8 +149,6 @@ class Project(Base):
 
     def __repr__(self):
         return f"project_name:{self.project_name}"
-
-
 
     @classmethod
     def assertIdExisted(cls, id):
@@ -145,17 +162,6 @@ class Project(Base):
         res = cle.query.filter_by(project_name=name).first()
         if res:
             abort(400, "projectName 重复!")
-
-
-    def Delete(self):
-        try:
-            db.session.delete(self)
-            db.session.commit()
-        except Exception as e:
-            log.exception(e)
-            db.session.rollback()
-
-
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -277,6 +283,8 @@ class Case(Base):
     interface_id = db.Column(db.INT, db.ForeignKey("interfaces.id"), comment="用例的接口")
     author = db.Column(db.String(32), default="", comment="创建者")
 
+    pwd = db.Column(db.String(200), nullable=True, comment="测试：报告地址")
+
     def __init__(self, name, request, pid=None, project_id=None, interface_id=None, author=None, desc=None):
         self.name = name
         self.request = request
@@ -327,6 +335,100 @@ class Suite(Base):
     __tablename__ = 'suite'
     name = db.Column(db.String(32))
     includes = db.Column(db.TEXT, comment="套件里的用例")
+
+    def __repr__(self):
+        return f"name:{self.name}"
+
+
+# UIcaseDemo
+class UICase(Base):
+    __tablename__ = 'uicase'
+    name = db.Column(db.String(200), unique=True, comment="用例名称")
+    desc = db.Column(db.String(200), nullable=True, default="", comment="用例描述")
+    creator = db.Column(db.String(20), comment="创建人")
+
+    headless = db.Column(db.Boolean, default=False, comment="是否无头测试,默认false")
+    windowsSize = db.Column(db.String(20), default="1920,1080", nullable=True, comment="窗口大小")
+
+
+    # (stay,running,over)
+    state = db.Column(db.String(32), default="stay", comment="实时状态")
+
+    casesteps = db.relationship("Steps", backref="uicase", cascade='all,delete')
+
+    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), comment='项目Id')
+
+    def __init__(self, name: str, creator: str, project_id: str, desc=None, headless=None,
+                 windowsSize=None):
+        self.name = name
+        self.desc = desc
+        self.project_id = project_id
+        self.creator = creator
+        self.headless = headless
+        self.windowsSize = windowsSize
+
+    def __repr__(self):
+        return f"name:{self.name}"
+
+
+DO = ['click', 'get', 'send_keys', 'get_text', 'get_title', 'get_url', 'clear', 'action_click', 'action_send_keys',
+      'switch_window', 'go_back', 'screenshot', 'js', 'sleep']
+
+
+class Steps(Base):
+    __tablename__ = 'steps'
+    case_id = db.Column(db.Integer, db.ForeignKey('uicase.id'), nullable=True, comment='所属用例')
+    name = db.Column(db.String(200), nullable=True, comment="步骤名称")
+    desc = db.Column(db.String(200), nullable=True, comment="步骤描述")
+    is_method = db.Column(db.Integer, nullable=True, comment="方法")
+    type = db.Column(db.String(32), nullable=True, comment="步骤类型")
+    log = db.Column(db.String(100), nullable=True, comment="这步骤日志")
+    locator = db.Column(db.String(100), nullable=True, comment="步骤元素")
+    do = db.Column(db.String(32), nullable=True, comment='步驟操作')
+    value = db.Column(db.TEXT, nullable=True, comment="请求数据")
+    variable = db.Column(db.TEXT, nullable=True, comment="变量名称")
+    validate = db.Column(db.TEXT, nullable=True, comment="认证")
+
+    def __init__(self, name=None, desc=None, is_method=None, type=None, locator=None, do=None,
+                 value=None, variable=None, validate=None):
+        self.name = name
+        self.desc = desc
+        self.is_method = is_method
+        self.type = type
+        self.locator = locator
+        if do:
+            do = self.assertDo(do)
+        else:
+            do = do
+        self.do = do
+        self.value = value
+        self.variable = variable
+        self.validate = validate
+
+    def assertDo(self, do: str) -> abort:
+        if do not in DO:
+            abort(400, f"Parameter:{do} not support")
+        return do
+
+    def __repr__(self):
+        return f"name:{self.name}"
+
+
+class UMethod(Base):
+    __tablename__ = 'umethod'
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), comment="項目Id")
+    name = db.Column(db.String(200), unique=True, comment="方法名称")
+    desc = db.Column(db.String(200), nullable=True, comment="方法描述")
+    body = db.Column(db.TEXT, comment="步骤step")
+    creator = db.Column(db.String(20), comment="创建人")
+    updater = db.Column(db.String(20), comment="修改人")
+
+    def __init__(self, pid, name, body, creator, desc=""):
+        self.project_id = pid
+        self.name = name
+        self.desc = desc
+        self.body = body
+        self.creator = creator
 
     def __repr__(self):
         return f"name:{self.name}"

@@ -9,6 +9,7 @@ import os
 
 import yaml
 from httprunner import HttpRunner
+from httprunner.make import convert_testcase_path
 
 from Model.Models import DebugTalks
 from comments.caseParseOpt import CaseParseOpt
@@ -35,18 +36,19 @@ class CaseGenerateOpt:
 
         # steps
         caseRequest = json.loads(caseInfo.request)
-
         teststeps = []
-        step = {}
 
         for case in caseRequest:
+            step = {}
             step['name'] = case['stepName']
             req = dict(url=case['stepUrl'], method=case['stepMethod'], headers=case['stepHeaders'])
             if case['stepJson']:
                 req['json'] = case['stepJson']
             elif case['stepParams']:
                 req['params'] = case['stepParams']
+
             step['request'] = req
+            step['extract'] = case['stepExtract']
             step['validate'] = [v for v in case['stepValidate']]
             teststeps.append(step)
 
@@ -86,12 +88,22 @@ class CaseGenerateOpt:
             yaml.dump(case_list, one_file, allow_unicode=True)
 
     def run(self):
-        from .shllOpt import Shell
+
         self.runner.run_path(self.finallPath)
-        print(self.caseDirPath)
         res = self.runner.get_summary().dict()
-        # Shell.invoke(f" hrun {self.finallPath} --alluredir={self.caseDirPath}/allure_results")
-        shell = "allure-2.9.0/bin/allure generate /home/mi/Fan_Platform/suite/tesInterfaces/allure_results -o  /home/mi/Fan_Platform/suite/tesInterfaces/report  --clean"
-        Shell.invoke(shell)
-        # print(res)
-        return res
+        print(self.caseDirPath)
+        print(self.finallPath)
+
+        # alluredir = os.path.join(self.caseDirPath,"alluredir")
+        #
+        # Shell.invoke(f"hrun {self.finallPath} --alluredir={alluredir}")
+        # # 生成report地址
+        # AllureReport = os.path.join(self.caseDirPath, "report")
+        # # shell执行
+        # Shell.invoke(f"allure-2.9.0/bin/allure generate {alluredir} -o  {AllureReport} --clean")
+
+        # index = os.path.join(AllureReport, "index.html")
+        # return res, index
+
+
+

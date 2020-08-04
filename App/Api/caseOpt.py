@@ -6,7 +6,7 @@
 """
 import json
 
-from flask import request, jsonify, g
+from flask import request, jsonify, g, render_template
 from flask_restful import Api, Resource, reqparse
 
 from App.Api.errors_and_auth import is_admin
@@ -48,7 +48,6 @@ class CaseOpt(Resource):
 
     @auth.login_required
     def post(self):
-        par = CaseParseOpt()
         user = g.user.username
         parse = reqparse.RequestParser(argument_class=MyArgument)
         parse.add_argument("caseName", type=str, required=True, help="caseName 不能为空")
@@ -59,9 +58,9 @@ class CaseOpt(Resource):
         caseDesc = parse.parse_args().get("caseDesc")
         caseInterfaceId = parse.parse_args().get("caseInterfaceId")
         caseProjectId = parse.parse_args().get("caseProjectId")
+
         # 判断是否重复
         Case.assertName(caseName)
-
         # 判断caseProjectId,caseInterfaceId
         Project.assertIdExisted(caseProjectId)
         Interfaces.assertIdExisted(caseInterfaceId)
@@ -71,14 +70,7 @@ class CaseOpt(Resource):
         if not caseSteps:
             return jsonify(dict(code=1, data="", err="caseSteps 不能为空"))
 
-        # 参数处理
-        for step in caseSteps:
-            step['stepHeaders'] = par.body_to_dict(step['stepHeaders'])
-            step['stepJson'] = par.body_to_dict(step['stepJson'])
-            step['stepParams'] = par.body_to_dict(step['stepParams'])
-            step['stepValidate'] = par.validate_to_dict(step['stepValidate'])
-
-        caseSteps = json.dumps(caseSteps, ensure_ascii=False)
+        caseSteps = self.__stepOpt(caseSteps=caseSteps)
 
         try:
             case = Case(name=caseName, desc=caseDesc, request=caseSteps, interface_id=caseInterfaceId,
@@ -96,37 +88,27 @@ class CaseOpt(Resource):
 
     @auth.login_required
     def put(self):
-        par = CaseParseOpt()
         user = g.user.username
         parse = reqparse.RequestParser(argument_class=MyArgument)
         parse.add_argument("caseId", type=int, required=True, help="caseId 不能为空")
         parse.add_argument("caseName", type=str, required=True, help="caseName 不能为空")
-        parse.add_argument("caseDesc", type=str, default="")
+        parse.add_argument("caseDesc", type=str, default="", required=False)
         caseId = parse.parse_args().get('caseId')
         caseName = parse.parse_args().get("caseName")
         caseDesc = parse.parse_args().get("caseDesc")
+
         # 判断是否重复
         Case.assertName(caseName)
-
         # 解析step
         caseSteps = request.json.get('caseSteps')
         if not caseSteps:
             return jsonify(dict(code=1, data="", err="caseSteps 不能为空"))
 
-        # 参数处理
-        for step in caseSteps:
-            step['stepHeaders'] = par.body_to_dict(step['stepHeaders'])
-            step['stepJson'] = par.body_to_dict(step['stepJson'])
-            step['stepParams'] = par.body_to_dict(step['stepParams'])
-            step['stepValidate'] = par.validate_to_dict(step['stepValidate'])
-
-        caseSteps = json.dumps(caseSteps, ensure_ascii=False)
-
         try:
             case = Case.get(caseId)
             case.name = caseName
             case.desc = caseDesc
-            case.request = caseSteps
+            case.request = self.__stepOpt(caseSteps)
             case.save()
             return jsonify(dict(code=0, data=case.id, msg='ok'))
 
@@ -137,10 +119,20 @@ class CaseOpt(Resource):
         finally:
             db.session.close()
 
+    def __stepOpt(self, caseSteps: list) -> str:
+        # 参数处理
+        par = CaseParseOpt()
+        for step in caseSteps:
+            step['stepHeaders'] = par.body_to_dict(step['stepHeaders'])
+            step['stepJson'] = par.body_to_dict(step['stepJson'])
+            step['stepParams'] = par.body_to_dict(step['stepParams'])
+            step['stepValidate'] = par.validate_to_dict(step['stepValidate'])
+            step['stepExtract'] = par.body_to_dict(step['stepExtract'])
+        return json.dumps(caseSteps, ensure_ascii=False)
+
     @auth.login_required
     @is_admin
     def delete(self):
-        user = g.user.username
         parse = reqparse.RequestParser(argument_class=MyArgument)
         parse.add_argument("caseId", type=int, required=True, help="caseId 不能为空")
         caseId = parse.parse_args().get('caseId')
@@ -179,9 +171,49 @@ class RunCase(Resource):
         do = CaseGenerateOpt()
         do.generateCaseFile(caseInfo=case, casePath=get_cwd(), env=env)
         res = do.run()
-        return jsonify(res)
-        # return "ok"
+        # status = res[0]
+        # case.pwd = res[1]
+        # db.session.commit()
+        #
+        # return jsonify(status)
+        return "ok"
+
+
+class AllureReport(Resource):
+    def get(self):
+        caseId = request.args.get("caseId")
+        if not caseId:
+            return jsonify(dict(code=1, data="", err="caseId 不能为空"))
+
+        case = Case.get(caseId)
+        return render_template(case.pwd)
+
+
+class DelCase(Resource):
+    """
+    徹底刪除用例
+    """
+
+    @auth.login_required
+    @is_admin
+    def post(self):
+        parse = reqparse.RequestParser(argument_class=MyArgument)
+        parse.add_argument("caseId", type=str, required=True, help="caseId 不能为空")
+        caseId = parse.parse_args().get('caseId')
+        try:
+            Case.get(caseId).Delete()
+            return jsonify(dict(code=0, data="", msg='ok'))
+
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+            return jsonify(dict(code=1, data="", err=f"错误:{str(e)}"))
+        finally:
+            db.session.close()
+
 
 api_script = Api(v1)
 api_script.add_resource(CaseOpt, "/caseOpt")
 api_script.add_resource(RunCase, "/runCase")
+api_script.add_resource(AllureReport, "/getAllureReport")
+api_script.add_resource(DelCase, '/delCase')

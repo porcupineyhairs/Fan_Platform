@@ -1,0 +1,27 @@
+{
+  "caseName": "baidu测试",
+  "caseDesc": "baidu",
+  "projectId": 11,
+  "caseSteps": [
+    {
+      "name": "打开网页",
+      "desc": "打开网页",
+      "do": "get",
+      "value": "www.baidu.com"
+    },
+    {
+      "name": "使用方法",
+      "is_method": 1
+    },
+    {
+      "name": "截图",
+      "do": "screenshot"
+    },
+    {
+      "name": "get title",
+      "do": "get_title",
+      "variable": "title",
+      "validate": [{"key": "title","val": "python_百度搜索","mode": "eq"}]
+    }
+  ]
+}

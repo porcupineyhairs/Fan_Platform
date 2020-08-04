@@ -1,0 +1,29 @@
+{
+	"methodName":"百度录入",
+	"methodDesc":"录入关键词, 点击搜索",
+	"methodProject":1,
+
+	"methodSteps":[
+		{
+			"name":"录入",
+			"desc":"录入关键词, 默认pyhton",
+			"type":"ID",
+			"locator":"kw",
+			"do":"SEND_KEYS",
+			"need_value":true,
+
+			"default_value":"python"
+
+
+		},
+		{
+			"name":"点击确定",
+			"desc":"",
+			"type":"ID",
+			"locator":"su",
+			"do":"CLICK"
+		}
+
+]
+
+}

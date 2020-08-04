@@ -24,6 +24,7 @@ def page_not_found(e):
 @v1.app_errorhandler(500)
 def host_err(e):
     return jsonify(dict(err="服务器有点问题,再康康")),500
+
 @v1.app_errorhandler(403)
 def host_err(e):
     return jsonify(dict(err="有问题啊,再康康吧")),500

@@ -82,6 +82,7 @@ def run_migrations_online():
         context.configure(
             compare_type=True,
             compare_server_default=True,
+            render_as_batch=True,
             connection=connection,
             target_metadata=target_metadata,
             process_revision_directives=process_revision_directives,
