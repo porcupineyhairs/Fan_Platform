@@ -3,8 +3,6 @@
 # @Author  : cyq
 # @File    : Base.py
 # @Desc    : 基类方法
-
-
 import os
 import time
 
@@ -16,16 +14,16 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
+from comments.log import get_log
 
+DriverPath = os.path.join(os.path.dirname(__file__), "chromedriver84")
 
 
 class PageBase:
     f = Faker(locale='zh_CN')
 
-    def __init__(self):
-
-        self.log = Log.LogInfo()
-        self.config = Config()
+    def __init__(self, headless=None, window_size="1920,1080"):
+        self.log = get_log(__name__)
 
         try:
             opt = webdriver.ChromeOptions()
@@ -33,14 +31,13 @@ class PageBase:
             if headless:
                 opt.add_argument('--headless')
             # 指定浏览器分辨率
-            opt.add_argument('--window-size=1920,1080')
+            if window_size:
+                opt.add_argument(f'--window-size={window_size}')
             self.driver = webdriver.Chrome(executable_path=DriverPath, options=opt)
             self.driver.implicitly_wait(10)
         except BaseException as e:
-            self.log.error(str(e))
+            self.log.exception(str(e))
             self.log.error('浏览器报错!')
-
-
 
     def scrollIntoView(self, la: tuple):
         """
@@ -56,20 +53,6 @@ class PageBase:
 
     def go_back(self):
         self.driver.back()
-
-    def login(self, user=None):
-        """
-        用户登陆
-        """
-        self.getUrl(self.config.domain)
-        if user:
-            self.send_keys(locator=('xpath', '//*[@id="miniLogin_username"]'), text=user)
-            self.send_keys(locator=('xpath', '//*[@id="miniLogin_pwd"]'), text=user)
-        else:
-            self.send_keys(locator=('xpath', '//*[@id="miniLogin_username"]'), text=self.config.username)
-            self.send_keys(locator=('xpath', '//*[@id="miniLogin_pwd"]'), text=self.config.password)
-        self.click(locator=('xpath', '//*[@id="message_LOGIN_IMMEDIATELY"]'))
-        time.sleep(0.5)
 
     def set_Browser_size(self):
         """
@@ -273,3 +256,7 @@ class PageBase:
         获取当前窗口的屏幕截图作为二进制数据
         """
         return self.driver.get_screenshot_as_png()
+
+
+if __name__ == '__main__':
+    print(DriverPath)

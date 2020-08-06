@@ -13,6 +13,7 @@ from App import auth, db
 from Model.Models import Project, UMethod, UICase, Steps
 from comments.MyRequest import MyArgument
 from comments.caseParseOpt import CaseParseOpt
+from comments.driverOpt import DriverOpt
 from comments.log import get_log
 from . import v1
 
@@ -216,6 +217,27 @@ class Method(Resource):
             return jsonify(dict(code=0, err=f"错误:{str(e)}"))
 
 
+class Run(Resource):
+
+    def post(self):
+        caseId = request.json.get('caseId')
+
+        case = UICase.get(caseId)
+
+        info = {"caseId": case.id, "name": case.name, "desc": case.desc,
+                "creator": case.creator,
+                "headless": case.headless, "windowsSize": case.windowsSize,
+                "status": case.status, "state": case.state,
+                "steps": [{"stepId": s.id, "name": s.name, "desc": s.desc, "methodId": s.is_method, "type": s.type,
+                           "locator": s.locator,
+                           "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
+                          s in case.casesteps]}
+        driver = DriverOpt(case=info)
+
+        driver.run()
+
+
 api_script = Api(v1)
 api_script.add_resource(UiCase, '/uCaseOpt')
 api_script.add_resource(Method, '/methodOpt')
+api_script.add_resource(Run, "/run")

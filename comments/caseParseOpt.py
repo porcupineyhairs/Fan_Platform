@@ -35,12 +35,11 @@ class CaseParseOpt:
         """
         l = []
 
-        for kv in  d:
+        for kv in d:
             data = {}
-            data[kv['mode']] =[kv.get("key"),kv.get('val')]
+            data[kv['mode']] = [kv.get("key"), kv.get('val')]
             l.append(data)
         return l
-
 
     def dict_to_body(self, a: dict):
         data = []
@@ -48,6 +47,9 @@ class CaseParseOpt:
             d = dict(key=k, val=v)
             data.append(d)
         return json.dumps(data, ensure_ascii=False)
+
+    def to_dict(self, params: list):
+        pass
 
 
 if __name__ == '__main__':
