@@ -6,10 +6,10 @@
 """
 import json
 
-from flask import request, jsonify, g
+from flask import request, jsonify, g, current_app
 from flask_restful import Resource, Api, reqparse
-
-from App import auth, db
+from App import auth, db, create_app, celery_
+from App.celery_ import create_celery
 from Model.Models import Project, UMethod, UICase, Steps
 from comments.MyRequest import MyArgument
 from comments.caseParseOpt import CaseParseOpt
@@ -221,20 +221,37 @@ class Run(Resource):
 
     def post(self):
         caseId = request.json.get('caseId')
-
         case = UICase.get(caseId)
+        case.case_state = "Running"
+        db.session.commit()
 
-        info = {"caseId": case.id, "name": case.name, "desc": case.desc,
-                "creator": case.creator,
-                "headless": case.headless, "windowsSize": case.windowsSize,
-                "status": case.status, "state": case.state,
-                "steps": [{"stepId": s.id, "name": s.name, "desc": s.desc, "methodId": s.is_method, "type": s.type,
-                           "locator": s.locator,
-                           "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
-                          s in case.casesteps]}
-        driver = DriverOpt(headless=info['headless'])
+        celery = create_celery(current_app)
+        result = celery.send_task(name='tasks.add_together', args=(2, 3))
+        print(result.wait())
 
-        driver.run(info["steps"])
+        # executor = ThreadPoolExecutor(20)
+        # executor.submit(run, caseId)
+        # result = run.apply_async(args=[caseId,])  # 发送异步任务，指定队列
+
+        return jsonify(dict(code=0, msg='运行成功', caseId=case.id))
+
+
+def run(caseId):
+    print(caseId)
+    create_app().app_context().push()
+    case = UiCase.get(caseId)
+    print(case)
+    info = {"caseId": case.id, "name": case.name, "desc": case.desc,
+            "creator": case.creator,
+            "headless": case.headless, "windowsSize": case.windowsSize,
+            "status": case.status, "state": case.state,
+            "steps": [{"stepId": s.id, "name": s.name, "desc": s.desc, "methodId": s.is_method, "type": s.type,
+                       "locator": s.locator,
+                       "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
+                      s in case.casesteps]}
+    print(info)
+    driver = DriverOpt(headless=info['headless'])
+    driver.run(info["steps"])
 
 
 api_script = Api(v1)

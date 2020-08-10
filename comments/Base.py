@@ -16,7 +16,12 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from comments.log import get_log
 
-DriverPath = os.path.join(os.path.dirname(__file__), "chromedriver84")
+import platform
+
+if platform.system() == "Windows":
+    DriverPath = os.path.join(os.path.dirname(__file__), "chromedriver7.exe")
+else:
+    DriverPath = os.path.join(os.path.dirname(__file__), "chromedriver84")
 
 
 class PageBase:
@@ -28,16 +33,28 @@ class PageBase:
         try:
             opt = webdriver.ChromeOptions()
             # 设置浏览器不提供可视化页面
-            if headless:
-                opt.add_argument('--headless')
+            # if headless:
+            #     opt.add_argument('--headless')
             # 指定浏览器分辨率
             if window_size:
-                opt.add_argument(f'--window-size={window_size}')
+                opt.add_argument('--window-size=' + window_size)
             self.driver = webdriver.Chrome(executable_path=DriverPath, options=opt)
             self.driver.implicitly_wait(10)
         except BaseException as e:
-            self.log.exception(str(e))
+            self.log.exception(e)
             self.log.error('浏览器报错!')
+            return
+
+    def get_url(self, url: str):
+        """
+        打開url
+        """
+        try:
+            self.driver.get(url)
+        except Exception as e:
+            self.log.error(str(e))
+            return None
+
 
     def scrollIntoView(self, la: tuple):
         """
@@ -210,15 +227,6 @@ class PageBase:
         element = self.find_element(locator)
         return element.get_attribute(name)
 
-    def getUrl(self, url: str):
-        """
-        打開url
-        """
-        try:
-            self.driver.get(url)
-        except Exception as e:
-            self.log.error(str(e))
-            return None
 
     def send_keys(self, locator: tuple, text: str):
         """

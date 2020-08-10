@@ -6,7 +6,11 @@
 """
 import time
 
+from App import create_app
+from comments.log import get_log
 from comments.Base import PageBase
+
+log = get_log(__name__)
 
 a = [{'id': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': None, 'type': None, 'locator': None, 'do': 'get',
       'value': 'www.baidu.com', 'variable': None, 'validate': None},
@@ -20,29 +24,22 @@ a = [{'id': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': None,
 
 class DriverOpt(PageBase):
 
-    # def __init__(self, case: dict):
-    #     self.__headless = case['headless']
-    #     self.__windowsSize = case['windowsSize']
-    #     self.__steps = case['steps']
-    #     super().__init__()
-
     def run(self, steps):
-        # create_app().app_context().push()
         print(steps)
         try:
             for step in steps:
                 self.__run_steps(step)
-        except TimeoutError as e:
-            print(e)
+        except Exception as e:
+            log.exception(e)
         finally:
             self.quit_Browser()
 
     def __run_steps(self, step: dict):
         do = step["do"]
-
+        print(do)
         if do == "get":
             print(step['value'])
-            self.getUrl(step['value'])
+            self.get_url(step['value'])
             time.sleep(5)
         elif do == 'screenshot':
             pass
