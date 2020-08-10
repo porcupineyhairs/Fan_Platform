@@ -4,8 +4,9 @@
 @name: driverOpt
 @desc: 用力参数处理
 """
+import time
 
-from App import create_app
+from comments.Base import PageBase
 
 a = [{'id': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': None, 'type': None, 'locator': None, 'do': 'get',
       'value': 'www.baidu.com', 'variable': None, 'validate': None},
@@ -15,20 +16,33 @@ a = [{'id': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': None,
       'value': None, 'variable': None, 'validate': None},
      {'id': 4, 'name': 'get title', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'get_title',
       'value': None, 'variable': 'title', 'validate': '[{"eq": ["title", "python_百度搜索"]}]'}]
-from .Base import PageBase
 
 
-class DriverOpt:
+class DriverOpt(PageBase):
 
-    def __init__(self, case: dict):
-        self.__headless = case['headless']
-        self.__windowsSize = case['windowsSize']
-        self.__steps = case['steps']
-        self.__worker = PageBase()
+    # def __init__(self, case: dict):
+    #     self.__headless = case['headless']
+    #     self.__windowsSize = case['windowsSize']
+    #     self.__steps = case['steps']
+    #     super().__init__()
 
-    def run(self):
-        create_app().app_context().push()
-        for step in self.__steps:
-            do = step['do']
-            print(do)
+    def run(self, steps):
+        # create_app().app_context().push()
+        print(steps)
+        try:
+            for step in steps:
+                self.__run_steps(step)
+        except TimeoutError as e:
+            print(e)
+        finally:
+            self.quit_Browser()
 
+    def __run_steps(self, step: dict):
+        do = step["do"]
+
+        if do == "get":
+            print(step['value'])
+            self.getUrl(step['value'])
+            time.sleep(5)
+        elif do == 'screenshot':
+            pass

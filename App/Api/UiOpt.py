@@ -232,9 +232,9 @@ class Run(Resource):
                            "locator": s.locator,
                            "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
                           s in case.casesteps]}
-        driver = DriverOpt(case=info)
+        driver = DriverOpt(headless=info['headless'])
 
-        driver.run()
+        driver.run(info["steps"])
 
 
 api_script = Api(v1)
