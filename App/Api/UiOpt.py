@@ -6,16 +6,17 @@
 """
 import json
 
-from flask import request, jsonify, g, current_app
+from flask import request, jsonify, g
 from flask_restful import Resource, Api, reqparse
-from App import auth, db, create_app, celery_
-from App.celery_ import create_celery
+
+from App import auth, db, create_app
 from Model.Models import Project, UMethod, UICase, Steps
 from comments.MyRequest import MyArgument
 from comments.caseParseOpt import CaseParseOpt
 from comments.driverOpt import DriverOpt
 from comments.log import get_log
 from . import v1
+from .tasks import runCase
 
 log = get_log(__name__)
 
@@ -225,33 +226,12 @@ class Run(Resource):
         case.case_state = "Running"
         db.session.commit()
 
-        celery = create_celery(current_app)
-        result = celery.send_task(name='tasks.add_together', args=(2, 3))
-        print(result.wait())
-
-        # executor = ThreadPoolExecutor(20)
-        # executor.submit(run, caseId)
-        # result = run.apply_async(args=[caseId,])  # 发送异步任务，指定队列
+        # 运行
+        runCase.apply_async(args=[caseId, ])
 
         return jsonify(dict(code=0, msg='运行成功', caseId=case.id))
 
 
-def run(caseId):
-    print(caseId)
-    create_app().app_context().push()
-    case = UiCase.get(caseId)
-    print(case)
-    info = {"caseId": case.id, "name": case.name, "desc": case.desc,
-            "creator": case.creator,
-            "headless": case.headless, "windowsSize": case.windowsSize,
-            "status": case.status, "state": case.state,
-            "steps": [{"stepId": s.id, "name": s.name, "desc": s.desc, "methodId": s.is_method, "type": s.type,
-                       "locator": s.locator,
-                       "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
-                      s in case.casesteps]}
-    print(info)
-    driver = DriverOpt(headless=info['headless'])
-    driver.run(info["steps"])
 
 
 api_script = Api(v1)

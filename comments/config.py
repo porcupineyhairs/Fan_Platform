@@ -7,12 +7,13 @@ case_log_path = os.path.join(root_path, 'case_log')
 if not os.path.exists(case_log_path):
     os.mkdir(case_log_path)
 
+
 class Config:
     SECRET_KEY = 'hard to guess string'
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    HOST = "123.56.217.241"
+    HOST = "127.0.0.1"
     redisPort = '6379'
 
     CASE_LOG_PATH = case_log_path
@@ -39,16 +40,19 @@ class DevelopmentConfig(Config):
     # MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     JSON_AS_ASCII = False  # 这个配置可以确保http请求返回的json数据中正常显示中文
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+
     CELERY_RESULT_BACKEND = 'redis://{}:{}'.format(Config.HOST, Config.redisPort)
     CELERY_BROKER_URL = 'redis://{}:{}'.format(Config.HOST, Config.redisPort)
     CELERY_TIMEZONE = 'Asia/Shanghai'
-    CELERYBEAT_SCHEDULE = {
-        'import_data': {
-            'task': 'test_ddd',
-            'schedule': timedelta(seconds=10)
-        },
-    }
+    CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 
+    # CELERYBEAT_SCHEDULE = {
+    #     'import_data': {
+    #         'task': 'test_ddd',
+    #         'schedule': timedelta(seconds=10)
+    #     },
+    # }
+    #
 
 class TestingConfig(Config):
     TESTING = True

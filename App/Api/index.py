@@ -6,8 +6,8 @@
 """
 
 from flask_restful import Resource, Api
-from App.Api import v1
 
+from App.Api import v1
 
 class Index(Resource):
 
@@ -16,7 +16,7 @@ class Index(Resource):
         return "ok"
 
 
-@v1.route("/testUrl",endpoint='testfunc')
+@v1.route("/testUrl", endpoint='testfunc')
 def get_foo():
     # raise InvalidUsage("errrr", status_code=500)
     return "ok"
@@ -25,4 +25,3 @@ def get_foo():
 
 api = Api(v1)
 api.add_resource(Index, '/')
-

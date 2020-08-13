@@ -388,6 +388,7 @@ class Steps(Base):
     value = db.Column(db.TEXT, nullable=True, comment="请求数据")
     variable = db.Column(db.TEXT, nullable=True, comment="变量名称")
     validate = db.Column(db.TEXT, nullable=True, comment="认证")
+    pic = db.Column(db.String(100),nullable=True,comment="截圖地址")
 
     def __init__(self, name=None, desc=None, is_method=None, type=None, locator=None, do=None,
                  value=None, variable=None, validate=None):

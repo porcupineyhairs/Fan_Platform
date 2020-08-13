@@ -4,6 +4,7 @@
 # @File    : Base.py
 # @Desc    : 基类方法
 import os
+import platform
 import time
 
 from faker import Faker
@@ -16,8 +17,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from comments.log import get_log
 
-import platform
-
 if platform.system() == "Windows":
     DriverPath = os.path.join(os.path.dirname(__file__), "chromedriver7.exe")
 else:
@@ -27,14 +26,14 @@ else:
 class PageBase:
     f = Faker(locale='zh_CN')
 
-    def __init__(self, headless=None, window_size="1920,1080"):
+    def __init__(self, headless=False, window_size="1920,1080"):
         self.log = get_log(__name__)
 
         try:
             opt = webdriver.ChromeOptions()
             # 设置浏览器不提供可视化页面
-            # if headless:
-            #     opt.add_argument('--headless')
+            if headless:
+                opt.add_argument('--headless')
             # 指定浏览器分辨率
             if window_size:
                 opt.add_argument('--window-size=' + window_size)
@@ -51,10 +50,11 @@ class PageBase:
         """
         try:
             self.driver.get(url)
+            time.sleep(1)
+            return f"get:{url}"
         except Exception as e:
-            self.log.error(str(e))
-            return None
-
+            self.log.error(e)
+            return str(e)
 
     def scrollIntoView(self, la: tuple):
         """
@@ -144,16 +144,6 @@ class PageBase:
     def getMsg(self):
         return self.get_text(('xpath', '//div[@class="ant-message"]/span'))
 
-    def get_url(self, url):
-        """
-        go url
-        """
-        try:
-            self.driver.get(url)
-        except Exception as e:
-            self.log.error(str(e))
-            return None
-
     def find_elements(self, locator: tuple, timeout=10):
         """
         定位一組元素,
@@ -175,7 +165,7 @@ class PageBase:
             time.sleep(0.5)
             return element
         except Exception as e:
-            self.log.error("未找到: {}".format(locator[1]))
+            self.log.exception(e)
             return None
 
     def click(self, locator: tuple):
@@ -186,16 +176,24 @@ class PageBase:
         try:
             if element:
                 element.click()
+                return f"click:{locator}"
         except Exception as e:
-            self.log.error(str(e))
-            self.log.error(f"{locator} 点击失败")
-            return
+            self.log.exception(e)
+            return f"{locator} 点击失败 :{str(e)}"
+
+    def sleep(self, s):
+        """
+        硬睡眠
+        """
+        time.sleep(s)
+        return f"sleep {s}s"
 
     def refresh(self):
         """
         刷新
         """
         self.driver.refresh()
+        return "刷新"
 
     def clear(self, locator: tuple):
         """
@@ -205,9 +203,10 @@ class PageBase:
             ele = self.find_element(locator)
             ele.send_keys(Keys.CONTROL, "a")
             ele.send_keys(Keys.DELETE)
-        except TimeoutException:
-            self.log.error("clear失敗 {}".format(str(locator)))
-            return False
+            return f"清空 {locator}"
+        except Exception as e:
+            self.log.exception(e)
+            return f"clear失敗 {locator}  {e}"
 
     def get_text(self, locator: tuple, timeout=3):
         """
@@ -215,32 +214,35 @@ class PageBase:
         """
         try:
             element = WebDriverWait(self.driver, timeout, 1).until(EC.presence_of_element_located(locator))
-            return element.text
-        except TimeoutException:
-            self.log.error('元素 {element} 没有找到'.format(element=locator))
-            return None
+            return element.text, f"get text {element.text}"
+        except Exception as e:
+            self.log.exception(e)
+            return None, f"get text fail :{e}"
 
     def get_attribute(self, locator: tuple, name: str):
         """
         获取属性
         """
         element = self.find_element(locator)
-        return element.get_attribute(name)
-
+        try:
+            attr = element.get_attribute(name)
+            return attr, f"get_attribute: {attr}"
+        except Exception as e:
+            self.log.exception(e)
+            return None, f"fail:{str(e)}"
 
     def send_keys(self, locator: tuple, text: str):
         """
         传参
         """
         element = self.find_element(locator)
-        if element:
-            try:
-                element.clear()
-                element.send_keys(text)
-            except WebDriverException as e:
-                self.log.error(str(e))
-                self.log.error('元素  {element}不可编辑'.format(element=locator))
-                return
+        try:
+            element.clear()
+            element.send_keys(text)
+            return f"send keys: {locator} {text}"
+        except WebDriverException as e:
+            self.log.error(e)
+            return f'send keys: {locator}  不可编辑  {str(e)}'
 
     def switch_to_window(self, new_window=None):
         """
@@ -259,12 +261,21 @@ class PageBase:
         else:
             self.driver.switch_to.window(new_window)
 
-    def Get_Png(self):
+    def get_title(self):
         """
-        获取当前窗口的屏幕截图作为二进制数据
+        get_title
         """
-        return self.driver.get_screenshot_as_png()
+        try:
+            title = self.driver.title
+            return title, f"get_title: {title}"
+        except Exception as e:
+            self.log.exception(e)
+            return None, f"{e}"
 
-
-if __name__ == '__main__':
-    print(DriverPath)
+    def Save_Pic(self, path):
+        try:
+            self.driver.get_screenshot_as_file(path)
+            return f"截图成功"
+        except Exception as e:
+            self.log.error(str(e))
+            return f"截图失败"
