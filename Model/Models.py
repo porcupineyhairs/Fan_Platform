@@ -347,9 +347,9 @@ class UICase(Base):
     desc = db.Column(db.String(200), nullable=True, default="", comment="用例描述")
     creator = db.Column(db.String(20), comment="创建人")
 
+
     headless = db.Column(db.Boolean, default=False, comment="是否无头测试,默认false")
     windowsSize = db.Column(db.String(20), default="1920,1080", nullable=True, comment="窗口大小")
-
 
     # (stay,running,over)
     state = db.Column(db.String(32), default="stay", comment="实时状态")
@@ -388,7 +388,8 @@ class Steps(Base):
     value = db.Column(db.TEXT, nullable=True, comment="请求数据")
     variable = db.Column(db.TEXT, nullable=True, comment="变量名称")
     validate = db.Column(db.TEXT, nullable=True, comment="认证")
-    pic = db.Column(db.String(100),nullable=True,comment="截圖地址")
+    pic = db.Column(db.String(100), nullable=True, comment="截圖地址")
+    data = db.Column(db.String(100), nullable=True, comment="验证数据")
 
     def __init__(self, name=None, desc=None, is_method=None, type=None, locator=None, do=None,
                  value=None, variable=None, validate=None):

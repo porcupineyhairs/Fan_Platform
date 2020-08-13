@@ -49,7 +49,6 @@ class UiCase(Resource):
             u = UICase(name=caseName, desc=caseDesc, creator=creator, project_id=projectId, headless=headless,
                        windowsSize=windowsSize)
             for step in steps:
-                print(step)
                 s = Steps(name=step['name'], desc=step['desc'], is_method=step['is_method'],
                           type=step['type'], locator=step['locator'], do=step['do'], value=step['value'],
                           variable=step['variable'], validate=step['validate'])
@@ -96,7 +95,48 @@ class UiCase(Resource):
 
     @auth.login_required
     def put(self):
-        pass
+        parse = reqparse.RequestParser(argument_class=MyArgument)
+        parse.add_argument("caseId", type=str, required=True, help="caseId 不能为空")
+        parse.add_argument("caseName", type=str, required=True, help="caseName 不能为空")
+        parse.add_argument("caseDesc", type=str, default="")
+        parse.add_argument("headless", type=bool, default=False)
+        parse.add_argument("windowsSize", type=str, default=None)
+
+        caseId = parse.parse_args().get("caseId")
+        headless = parse.parse_args().get("headless")
+        windowsSize = parse.parse_args().get("windowsSize")
+        caseName = parse.parse_args().get('caseName')
+        caseDesc = parse.parse_args().get('caseDesc')
+        steps = self._del_step_info(request.json.get('caseSteps'))
+
+        try:
+            u = UICase.get(caseId)
+            u.name = caseName
+            u.desc = caseDesc
+            u.headless = headless
+            u.windowsSize = windowsSize
+
+            for step in steps:
+                s = Steps.get(step['id'])
+                s.name = step['name']
+                s.desc = step['desc']
+                s.is_method = step['is_method']
+                s.type = step['type']
+                s.locator = step['locator']
+                s.do = step['do']
+                s.value = step['value']
+                s.variable = step['variable']
+                s.validate = step['validate']
+
+            db.session.commit()
+            return jsonify(dict(code=1, data=u.id, msg='ok'))
+
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+            return jsonify(dict(code=0, data="", err=f"错误:{e}"))
+        finally:
+            db.session.close()
 
     @auth.login_required
     def delete(self):
@@ -230,8 +270,6 @@ class Run(Resource):
         runCase.apply_async(args=[caseId, ])
 
         return jsonify(dict(code=0, msg='运行成功', caseId=case.id))
-
-
 
 
 api_script = Api(v1)

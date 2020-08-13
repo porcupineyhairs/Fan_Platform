@@ -21,7 +21,53 @@
       "name": "get title",
       "do": "get_title",
       "variable": "title",
-      "validate": [{"key": "title","val": "python_百度搜索","mode": "eq"}]
+      "validate": [
+        {
+          "key": "title",
+          "val": "python_百度搜索",
+          "mode": "eq"
+        }
+      ]
+    }
+  ]
+}
+
+//update
+{
+  "caseId": 1,
+  "caseName": "baidu测试",
+  "caseDesc": "baidu",
+  "headless": false,
+  "caseSteps": [
+    {
+      "id": 1,
+      "name": "打开网页",
+      "desc": "打开网页",
+      "do": "get",
+      "value": "http://www.baidu.com"
+    },
+    {
+      "id": 2,
+      "name": "使用方法",
+      "is_method": 1
+    },
+    {
+      "id": 3,
+      "name": "截图",
+      "do": "screenshot"
+    },
+    {
+      "id": 4,
+      "name": "get title",
+      "do": "get_title",
+      "variable": "title",
+      "validate": [
+        {
+          "key": "title",
+          "val": "python_百度搜索",
+          "mode": "eq"
+        }
+      ]
     }
   ]
 }

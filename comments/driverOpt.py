@@ -10,8 +10,10 @@ import os
 from Model.Models import UMethod, Steps
 from comments.Base import PageBase
 from comments.log import get_log
+from App import create_app, db
 
 log = get_log(__name__)
+create_app().app_context().push()
 
 a = [{'id': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': None, 'type': None, 'locator': None, 'do': 'get',
       'value': 'http://www.baidu.com', 'variable': None, 'validate': None},
@@ -22,9 +24,7 @@ a = [{'id': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': None,
      {'id': 4, 'name': 'get_title', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'get_title',
       'value': None, 'variable': 'title', 'validate': '[{"eq": ["title", "python_百度搜索"]}]'}]
 
-from App import create_app, db
 
-create_app().app_context().push()
 
 
 class DriverOpt(PageBase):
@@ -36,6 +36,7 @@ class DriverOpt(PageBase):
         except Exception as e:
             log.exception(e)
         finally:
+
             self.quit_Browser()
 
     def __run_steps(self, step: dict):
@@ -69,10 +70,10 @@ class DriverOpt(PageBase):
         elif do == "sleep":
             current_step.log = self.sleep(step['value'])
         elif do == 'get_text':
-            current_step.value, current_step.log = self.get_text((step['type'], step['locator']))
+            current_step.data, current_step.log = self.get_text((step['type'], step['locator']))
 
         elif do == 'get_attribute':
-            current_step.value, current_step.log = self.get_attribute((step['type'], step['locator']), step['value'])
+            current_step.data, current_step.log = self.get_attribute((step['type'], step['locator']), step['value'])
 
         elif do == 'refresh':
             current_step.log = self.refresh()
@@ -83,9 +84,8 @@ class DriverOpt(PageBase):
         elif do == "switch_to_window":
             self.switch_to_window(step['value'])
 
-
         elif do == "get_title":
-            current_step.value, current_step.log = self.get_title()
+            current_step.data, current_step.log = self.get_title()
 
         db.session.commit()
 
