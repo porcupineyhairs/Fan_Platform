@@ -347,7 +347,6 @@ class UICase(Base):
     desc = db.Column(db.String(200), nullable=True, default="", comment="用例描述")
     creator = db.Column(db.String(20), comment="创建人")
 
-
     headless = db.Column(db.Boolean, default=False, comment="是否无头测试,默认false")
     windowsSize = db.Column(db.String(20), default="1920,1080", nullable=True, comment="窗口大小")
 
@@ -366,6 +365,19 @@ class UICase(Base):
         self.creator = creator
         self.headless = headless
         self.windowsSize = windowsSize
+
+    def delete_steps(self):
+        try:
+            for step in self.steps_records:
+                db.session.delete(step)
+                db.session.commit()
+        except Exception as e:
+            log.exception(e)
+            db.session.rollback()
+
+    @property
+    def steps_records(self):
+        return self.casesteps
 
     def __repr__(self):
         return f"name:{self.name}"

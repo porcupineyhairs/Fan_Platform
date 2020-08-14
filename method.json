@@ -1,0 +1,50 @@
+//put
+{
+    "methodId": 1,
+    "methodName": "baidu ",
+    "methodDesc": "百度录入",
+    "methodBody": [
+        {
+            "id": 1,
+            "name": "录入关键词",
+            "desc": "desc",
+            "type": "id",
+            "locator": "kw",
+            "do": "send_keys",
+            "value": "java"
+        },
+        {
+            "id": 2,
+            "name": "点击确定",
+            "desc": "desc",
+            "type": "xpath",
+            "locator": "//input[@id='su']",
+            "do": "click"
+        }
+    ]
+}
+//post
+{
+    "methodName": "baidu ",
+    "methodDesc": "百度录入",
+    "ProjectId":11,
+    "methodBody": [
+        {
+            "id": 1,
+            "name": "录入关键词",
+            "desc": "desc",
+            "type": "id",
+            "locator": "kw",
+            "do": "send_keys",
+            "value": "java"
+        },
+        {
+            "id": 2,
+            "name": "点击确定",
+            "desc": "desc",
+            "type": "xpath",
+            "locator": "//input[@id='su']",
+            "do": "click"
+        }
+    ]
+}

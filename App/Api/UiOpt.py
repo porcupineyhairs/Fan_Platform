@@ -9,7 +9,7 @@ import json
 from flask import request, jsonify, g
 from flask_restful import Resource, Api, reqparse
 
-from App import auth, db, create_app
+from App import auth, db
 from Model.Models import Project, UMethod, UICase, Steps
 from comments.MyRequest import MyArgument
 from comments.caseParseOpt import CaseParseOpt
@@ -116,17 +116,25 @@ class UiCase(Resource):
             u.headless = headless
             u.windowsSize = windowsSize
 
+            # 刪除已存在
+            u.delete_steps()
+            # for step in steps:
+            #     s = Steps.get(step['id'])
+            #     s.name = step['name']
+            #     s.desc = step['desc']
+            #     s.is_method = step['is_method']
+            #     s.type = step['type']
+            #     s.locator = step['locator']
+            #     s.do = step['do']
+            #     s.value = step['value']
+            #     s.variable = step['variable']
+            #     s.validate = step['validate']
             for step in steps:
-                s = Steps.get(step['id'])
-                s.name = step['name']
-                s.desc = step['desc']
-                s.is_method = step['is_method']
-                s.type = step['type']
-                s.locator = step['locator']
-                s.do = step['do']
-                s.value = step['value']
-                s.variable = step['variable']
-                s.validate = step['validate']
+                s = Steps(name=step['name'], desc=step['desc'], is_method=step['is_method'],
+                          type=step['type'], locator=step['locator'], do=step['do'], value=step['value'],
+                          variable=step['variable'], validate=step['validate'])
+                u.casesteps.append(s)
+            u.save()
 
             db.session.commit()
             return jsonify(dict(code=1, data=u.id, msg='ok'))
@@ -262,14 +270,32 @@ class Run(Resource):
 
     def post(self):
         caseId = request.json.get('caseId')
+        back = request.json.get("back")
         case = UICase.get(caseId)
         case.case_state = "Running"
         db.session.commit()
 
-        # 运行
-        runCase.apply_async(args=[caseId, ])
+        if back:
 
-        return jsonify(dict(code=0, msg='运行成功', caseId=case.id))
+            # celery运行
+            runCase.apply_async(args=[caseId, ])
+            return jsonify(dict(code=0, msg='运行成功', caseId=case.id))
+
+        else:
+
+            case = UICase.get(caseId)
+            info = {"caseId": case.id, "name": case.name, "desc": case.desc,
+                    "creator": case.creator,
+                    "headless": case.headless, "windowsSize": case.windowsSize,
+                    "status": case.status, "state": case.state,
+                    "steps": [{"id": s.id, "name": s.name, "desc": s.desc, "methodId": s.is_method, "type": s.type,
+                               "locator": s.locator,
+                               "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
+                              s in case.casesteps]}
+            driver = DriverOpt(headless=info['headless'])
+            driver.run(info["steps"])
+
+            return jsonify(dict(code=0, msg='运行完成', caseId=case.id))
 
 
 api_script = Api(v1)

@@ -58,5 +58,7 @@ if __name__ == '__main__':
     b = {"key": "8fe3b232710c4c0d87b761ed5301e7a4", "info": "你叫什么", "userid": "123456"}
     g = [{"key": "status_code", "val": 200, "mode": "eq"}, {"key": "body.text", "val": "我是棒棒哒图灵机器人", "mode": "eq"},
          {"key": "code", "val": 10000, "mode": "eq"}]
-    print(CaseParseOpt().validate_to_dict(g))
-    print(CaseParseOpt().dict_to_body(b))
+
+    dd = [{'id': 1, 'name': '录入关键词', 'desc': 'desc', 'type': 'id', 'locator': 'kw', 'do': 'send_keys', 'value': 'java'},
+          {'id': 2, 'name': '点击确定', 'desc': 'desc', 'type': 'xpath', 'locator': "//input[@id='su']", 'do': 'click'}]
+    print(json.dumps(dd, ensure_ascii=False))
