@@ -35,7 +35,7 @@
 //update
 {
   "caseId": 1,
-  "caseName": "baidu测试",
+  "caseName": "baidu测试 ",
   "caseDesc": "baidu",
   "headless": false,
   "caseSteps": [
@@ -52,12 +52,24 @@
       "is_method": 1
     },
     {
-      "id": 3,
+    	"id":3,
+    	"name":"sleep",
+    	"do":"sleep",
+    	"value":2
+    },
+    {
+      "id": 4,
       "name": "截图",
       "do": "screenshot"
     },
     {
-      "id": 4,
+    	"id":5,
+    	"name":"sleep",
+    	"do":"sleep",
+    	"value":2
+    },
+    {
+      "id": 6,
       "name": "get title",
       "do": "get_title",
       "variable": "title",

@@ -15,5 +15,6 @@ class Verify:
 
     def verify(self):
         for val in self.validate:
+            pass
 
 
