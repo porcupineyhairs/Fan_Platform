@@ -12,6 +12,7 @@ from flask_restful import Resource, Api, reqparse
 from App import auth, db
 from Model.Models import Project, UMethod, UICase, Steps
 from comments.MyRequest import MyArgument
+from comments.Verify import Verify
 from comments.caseParseOpt import CaseParseOpt
 from comments.driverOpt import DriverOpt
 from comments.log import get_log
@@ -115,6 +116,7 @@ class UiCase(Resource):
             u.desc = caseDesc
             u.headless = headless
             u.windowsSize = windowsSize
+            u.state = "stay"
 
             # 刪除已存在
             u.delete_steps()
@@ -293,12 +295,33 @@ class Run(Resource):
                                "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
                               s in case.casesteps]}
             driver = DriverOpt(headless=info['headless'])
-            driver.run(info["steps"])
+            driver.run(caseId, info["steps"])
 
             return jsonify(dict(code=0, msg='运行完成', caseId=case.id))
+
+
+class Report(Resource):
+
+    def get(self):
+        parse = reqparse.RequestParser(argument_class=MyArgument)
+        parse.add_argument("caseId", type=str, required=True, help="caseId 不能为空")
+        caseId = parse.parse_args().get('caseId')
+
+        u = UICase.get(caseId)
+
+        if u.state != "over":
+            return jsonify(dict(code=0, msg='用例未运行或运行中。'))
+
+        info = u.get_steps_info
+        for stepInfo in info['caseSteps']:
+            if stepInfo['validate']:
+                Verify(stepInfo)
+
+        return jsonify(dict(code=0, msg='ok', data=info))
 
 
 api_script = Api(v1)
 api_script.add_resource(UiCase, '/uCaseOpt')
 api_script.add_resource(Method, '/methodOpt')
 api_script.add_resource(Run, "/run")
+api_script.add_resource(Report, "/uReport")

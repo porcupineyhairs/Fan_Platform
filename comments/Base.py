@@ -51,10 +51,10 @@ class PageBase:
         try:
             self.driver.get(url)
             time.sleep(1)
-            return f"get:{url}"
+            return f"get Url:{url}      ... success!"
         except Exception as e:
             self.log.error(e)
-            return str(e)
+            return f"get Url:{url}      ... fail! \n {str(e)}"
 
     def scrollIntoView(self, la: tuple):
         """
@@ -69,7 +69,12 @@ class PageBase:
             return None
 
     def go_back(self):
-        self.driver.back()
+        try:
+            self.driver.back()
+            return f"go back      ... success!"
+        except Exception as e:
+            self.log.exception(e)
+            return f"go back      ... success! \n {str(e)}"
 
     def set_Browser_size(self):
         """
@@ -77,9 +82,9 @@ class PageBase:
         """
         try:
             self.driver.maximize_window()
+            self.log.info('set maximize_window success')
         except Exception as e:
-            self.log.error(str(e))
-            return None
+            self.log.error(f"set maximize_window success  \n {str(e)}")
 
     def quit_Browser(self):
         """
@@ -87,6 +92,7 @@ class PageBase:
         """
         try:
             self.driver.quit()
+
         except Exception as e:
             self.log.error(str(e))
             return None
@@ -141,9 +147,6 @@ class PageBase:
         except Exception as e:
             self.log.error(e)
 
-    def getMsg(self):
-        return self.get_text(('xpath', '//div[@class="ant-message"]/span'))
-
     def find_elements(self, locator: tuple, timeout=10):
         """
         定位一組元素,
@@ -176,10 +179,10 @@ class PageBase:
         try:
             if element:
                 element.click()
-                return f"click:{locator}"
+                return f"click locator:({locator[1]})      ... success!"
         except Exception as e:
             self.log.exception(e)
-            return f"{locator} 点击失败 :{str(e)}"
+            return f"click locator:({locator[1]})      ... success! \n {str(e)}"
 
     def sleep(self, s):
         """
@@ -193,7 +196,7 @@ class PageBase:
         刷新
         """
         self.driver.refresh()
-        return "刷新"
+        return f"refresh    ... success!"
 
     def clear(self, locator: tuple):
         """
@@ -203,10 +206,10 @@ class PageBase:
             ele = self.find_element(locator)
             ele.send_keys(Keys.CONTROL, "a")
             ele.send_keys(Keys.DELETE)
-            return f"清空 {locator}"
+            return f"clear locator:{locator[1]}    ... success!"
         except Exception as e:
             self.log.exception(e)
-            return f"clear失敗 {locator}  {e}"
+            return f"clear locator:{locator[1]}    ... fail! \n {str(e)}"
 
     def get_text(self, locator: tuple, timeout=3):
         """
@@ -214,10 +217,10 @@ class PageBase:
         """
         try:
             element = WebDriverWait(self.driver, timeout, 1).until(EC.presence_of_element_located(locator))
-            return element.text, f"get text {element.text}"
+            return element.text, f"get text :{element.text}    ... success!"
         except Exception as e:
             self.log.exception(e)
-            return None, f"get text fail :{e}"
+            return f"get text   ... fail! \n {str(e)}"
 
     def get_attribute(self, locator: tuple, name: str):
         """
@@ -226,10 +229,10 @@ class PageBase:
         element = self.find_element(locator)
         try:
             attr = element.get_attribute(name)
-            return attr, f"get_attribute: {attr}"
+            return attr, f"get attribute :{attr}    ... success!"
         except Exception as e:
             self.log.exception(e)
-            return None, f"fail:{str(e)}"
+            return f"get attribute   ... fail! \n {str(e)}"
 
     def send_keys(self, locator: tuple, text: str):
         """
@@ -239,10 +242,10 @@ class PageBase:
         try:
             element.clear()
             element.send_keys(text)
-            return f"send keys: {locator} {text}"
+            return f"send keys: {text}   ... success!"
         except WebDriverException as e:
             self.log.error(e)
-            return f'send keys: {locator}  不可编辑  {str(e)}'
+            return f"send keys: {text}   ... fail! \n {str(e)}"
 
     def switch_to_window(self, new_window=None):
         """
@@ -267,15 +270,15 @@ class PageBase:
         """
         try:
             title = self.driver.title
-            return title, f"get_title: {title}"
+            return title, f"get title: {title}    ... success!"
         except Exception as e:
             self.log.exception(e)
-            return None, f"{e}"
+            return None, f"get title: None    ... fail! \n {str(e)}"
 
     def Save_Pic(self, path):
         try:
             self.driver.get_screenshot_as_file(path)
-            return f"截图成功"
+            return f"Save pic   ... success"
         except Exception as e:
             self.log.error(str(e))
-            return f"截图失败"
+            return f"Save pic   ... fail \n {str(e)}"

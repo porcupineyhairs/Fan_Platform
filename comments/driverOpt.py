@@ -8,7 +8,7 @@ import json
 import os
 
 from App import create_app, db
-from Model.Models import UMethod, Steps
+from Model.Models import UMethod, Steps, UICase
 from comments.Base import PageBase
 from comments.log import get_log
 
@@ -29,14 +29,16 @@ a = [{'stepId': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': N
 
 class DriverOpt(PageBase):
 
-    def run(self, steps):
+    def run(self, caseID, steps):
         try:
             for step in steps:
                 self.__run_steps(step)
         except Exception as e:
             log.exception(e)
         finally:
-
+            u = UICase.get(caseID)
+            u.state = "over"
+            db.session.commit()
             self.quit_Browser()
 
     def __run_steps(self, step: dict):
@@ -71,16 +73,12 @@ class DriverOpt(PageBase):
             current_step.log = self.sleep(float(step['value']))
         elif do == 'get_text':
             current_step.data, current_step.log = self.get_text((step['type'], step['locator']))
-
         elif do == 'get_attribute':
             current_step.data, current_step.log = self.get_attribute((step['type'], step['locator']), step['value'])
-
         elif do == 'refresh':
             current_step.log = self.refresh()
-
         elif do == 'clear':
             current_step.log = self.clear((step['type'], step['locator']))
-
         elif do == "switch_to_window":
             self.switch_to_window(step['value'])
 

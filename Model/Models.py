@@ -343,7 +343,7 @@ class Suite(Base):
 # UIcaseDemo
 class UICase(Base):
     __tablename__ = 'uicase'
-    name = db.Column(db.String(200), unique=True, comment="用例名称")
+    name = db.Column(db.String(200), unique=False, comment="用例名称")
     desc = db.Column(db.String(200), nullable=True, default="", comment="用例描述")
     creator = db.Column(db.String(20), comment="创建人")
 
@@ -379,6 +379,38 @@ class UICase(Base):
     def steps_records(self):
         return self.casesteps
 
+    @property
+    def get_steps_info(self):
+
+        info = []
+        for step in self.casesteps:
+            data = {}
+            data['stepId'] = step.id
+            data['name'] = step.name
+            data['desc'] = step.desc
+            data['is_method'] = step.is_method
+            data['type'] = step.type
+            data['log'] = step.log
+            data['locator'] = step.locator
+            data['do'] = step.do
+            data['value'] = step.value
+            data['variable'] = step.variable
+            data['validate'] = step.validate
+            data['pic'] = step.pic
+            data['data'] = step.data
+            info.append(data)
+        data = {"caseId": self.id,
+                'caseName': self.name,
+                'caseDesc': self.desc,
+                "caseCreator": self.creator,
+                "Headless": self.headless,
+                "windowsSize": self.windowsSize,
+                "state": self.state,
+                "status": self.status,
+                "PorjectId": self.project_id,
+                "caseSteps": info}
+        return data
+
     def __repr__(self):
         return f"name:{self.name}"
 
@@ -390,7 +422,7 @@ DO = ['click', 'get', 'send_keys', 'get_text', 'get_title', 'get_url', 'clear', 
 class Steps(Base):
     __tablename__ = 'steps'
     case_id = db.Column(db.Integer, db.ForeignKey('uicase.id'), nullable=True, comment='所属用例')
-    name = db.Column(db.String(200), nullable=True, comment="步骤名称")
+    name = db.Column(db.String(200), nullable=True, unique=False, comment="步骤名称")
     desc = db.Column(db.String(200), nullable=True, comment="步骤描述")
     is_method = db.Column(db.Integer, nullable=True, comment="方法")
     type = db.Column(db.String(32), nullable=True, comment="步骤类型")
