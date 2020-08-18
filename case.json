@@ -73,13 +73,12 @@
       "name": "get title",
       "do": "get_title",
       "variable": "title",
-      "validate": [
+      "validate":
         {
-          "key": "title",
-          "val": "python_百度搜索",
+          "expData": "java_百度搜索",
           "mode": "eq"
         }
-      ]
+
     }
   ]
 }

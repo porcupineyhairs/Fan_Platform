@@ -175,7 +175,7 @@ class UiCase(Resource):
                  "value": None, "variable": None, "validate": None}
             for k, v in step.items():
                 if k == "validate":
-                    v = json.dumps(c.validate_to_dict(v), ensure_ascii=False)
+                    v = json.dumps(v, ensure_ascii=False)
                 s[k] = v
             newList.append(s)
         return newList
@@ -315,7 +315,7 @@ class Report(Resource):
         info = u.get_steps_info
         for stepInfo in info['caseSteps']:
             if stepInfo['validate']:
-                Verify(stepInfo)
+                stepInfo['verify'] = Verify(stepInfo).verify()
 
         return jsonify(dict(code=0, msg='ok', data=info))
 

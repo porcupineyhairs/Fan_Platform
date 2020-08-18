@@ -8,13 +8,11 @@ import json
 class Verify:
 
     def __init__(self, step: dict):
-        self.data = {step["variable"]: step['data']}
-        self.validate = json.loads(step['validate'])
-
-        print(self.data, self.validate)
+        self.step = step
+        self.resData = self.step['data']
+        self.expData = json.loads(self.step['validate'])
+        self.mode = self.expData.pop("mode")
 
     def verify(self):
-        for val in self.validate:
-            pass
-
-
+        if self.mode == 'eq':
+            return self.resData == self.expData['expData']

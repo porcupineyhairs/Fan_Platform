@@ -52,7 +52,6 @@ class DriverOpt(PageBase):
 
         elif "methodId" in step and step['methodId']:
             methodSteps = json.loads(UMethod.get(step['methodId']).body)
-            print(methodSteps)
             self.__run_method_steps(methodSteps)
         elif do == 'screenshot':
             # 截图
