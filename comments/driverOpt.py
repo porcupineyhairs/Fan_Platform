@@ -15,16 +15,18 @@ from comments.log import get_log
 log = get_log(__name__)
 create_app().app_context().push()
 
-a = [{'stepId': 1, 'name': '打开网页', 'desc': '打开网页', 'methodId': None, 'type': None, 'locator': None, 'do': 'get',
+a = [{'id': 7, 'name': '打开网页', 'desc': '打开网页', 'methodId': None, 'type': None, 'locator': None, 'do': 'get',
       'value': 'http://www.baidu.com', 'variable': None, 'validate': None},
-     {'stepId': 2, 'name': '使用方法', 'desc': None, 'methodId': 1, 'type': None, 'locator': None, 'do': None,
+     {'id': 8, 'name': '使用方法', 'desc': None, 'methodId': 1, 'type': None, 'locator': None, 'do': None,
+      'value': '[{"id": "1", "value": "python"}]', 'variable': None, 'validate': None},
+     {'id': 9, 'name': 'sleep', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'sleep',
+      'value': '2', 'variable': None, 'validate': None},
+     {'id': 10, 'name': '截图', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'screenshot',
       'value': None, 'variable': None, 'validate': None},
-     {'stepId': 3, 'name': 'sleep', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'sleep',
-      'value': '1', 'variable': None, 'validate': None},
-     {'stepId': 4, 'name': '截图', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'screenshot',
-      'value': None, 'variable': None, 'validate': None},
-     {'stepId': 5, 'name': 'get title', 'desc': None, 'methodId': None, 'type': None, 'locator': None,
-      'do': 'get_title', 'value': None, 'variable': 'title', 'validate': '[{"eq": ["title", "python_百度搜索"]}]'}]
+     {'id': 11, 'name': 'sleep', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'sleep',
+      'value': '2', 'variable': None, 'validate': None},
+     {'id': 12, 'name': 'get title', 'desc': None, 'methodId': None, 'type': None, 'locator': None, 'do': 'get_title',
+      'value': None, 'variable': 'title', 'validate': '{"expData": "python_百度搜索", "mode": "eq"}'}]
 
 
 class DriverOpt(PageBase):
@@ -52,14 +54,22 @@ class DriverOpt(PageBase):
 
         elif "methodId" in step and step['methodId']:
             methodSteps = json.loads(UMethod.get(step['methodId']).body)
+            if step['value']:
+                methodSteps = self.__del_method_value(methodSteps, json.loads(step['value']))
             self.__run_method_steps(methodSteps)
+
+
+
         elif do == 'screenshot':
             # 截图
             from comments.seve_pic import getPicPath
             path = getPicPath()
             # 判断时候存在
             if current_step.pic:
-                os.remove(current_step.pic)
+                try:
+                    os.remove(current_step.pic)
+                except Exception:
+                    pass
                 # 截圖到目錄
             current_step.log = self.Save_Pic(path)
             current_step.pic = path
@@ -69,7 +79,7 @@ class DriverOpt(PageBase):
         elif do == "send_keys":
             current_step.log = self.send_keys((step['type'], step['locator']), step['value'])
         elif do == "sleep":
-            current_step.log = self.sleep(float(step['value']))
+            current_step.log = self.sleep(int(step['value']))
         elif do == 'get_text':
             current_step.data, current_step.log = self.get_text((step['type'], step['locator']))
         elif do == 'get_attribute':
@@ -93,6 +103,21 @@ class DriverOpt(PageBase):
         except Exception as e:
             log.exception(e)
 
+    def __del_method_value(self, steps: list, value: list) -> list:
+        """
+        [{'id': '1', 'value': 'python'},]
 
-if __name__ == '__main__':
-    DriverOpt().run(a)
+        [{'id': 1, 'name': '录入关键词', 'desc': 'desc', 'type': 'id', 'locator': 'kw', 'do': 'send_keys', 'value': 'java', 'variable': 'key'}]
+
+        ==>
+        [{'id': 1, 'name': '录入关键词', 'desc': 'desc', 'type': 'id', 'locator': 'kw', 'do': 'send_keys', 'value': 'python', 'variable': 'key'}]
+
+        方法步骤使用外部传参
+        """
+        data = {}
+        for val in value:
+            data[val['id']] = val['value']
+        for step in steps:
+            if str(step['id']) in data:
+                step['value'] = data[str(step['id'])]
+        return steps

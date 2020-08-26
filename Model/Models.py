@@ -364,7 +364,8 @@ class UICase(Base):
         self.project_id = project_id
         self.creator = creator
         self.headless = headless
-        self.windowsSize = windowsSize
+        if windowsSize:
+            self.windowsSize = windowsSize
 
     def delete_steps(self):
         try:

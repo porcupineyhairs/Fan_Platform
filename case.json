@@ -34,51 +34,53 @@
 
 //update
 {
-  "caseId": 1,
-  "caseName": "baidu测试 ",
-  "caseDesc": "baidu",
-  "headless": false,
-  "caseSteps": [
-    {
-      "id": 1,
-      "name": "打开网页",
-      "desc": "打开网页",
-      "do": "get",
-      "value": "http://www.baidu.com"
-    },
-    {
-      "id": 2,
-      "name": "使用方法",
-      "is_method": 1
-    },
-    {
-    	"id":3,
-    	"name":"sleep",
-    	"do":"sleep",
-    	"value":2
-    },
-    {
-      "id": 4,
-      "name": "截图",
-      "do": "screenshot"
-    },
-    {
-    	"id":5,
-    	"name":"sleep",
-    	"do":"sleep",
-    	"value":2
-    },
-    {
-      "id": 6,
-      "name": "get title",
-      "do": "get_title",
-      "variable": "title",
-      "validate":
+    "caseId": 2,
+    "caseName": "baidu测试 python",
+    "caseDesc": "baidu",
+    "headless": false,
+    "caseSteps": [
         {
-          "expData": "java_百度搜索",
-          "mode": "eq"
+            "id": 1,
+            "name": "打开网页",
+            "desc": "打开网页",
+            "do": "get",
+            "value": "http://www.baidu.com"
+        },
+        {
+            "id": 2,
+            "name": "使用方法",
+            "is_method": 1,
+            "value": [{
+                "id": "1",
+                "value":"python"
+            }]
+        },
+        {
+            "id": 3,
+            "name": "sleep",
+            "do": "sleep",
+            "value": 2
+        },
+        {
+            "id": 4,
+            "name": "截图",
+            "do": "screenshot"
+        },
+        {
+            "id": 5,
+            "name": "sleep",
+            "do": "sleep",
+            "value": 2
+        },
+        {
+            "id": 6,
+            "name": "get title",
+            "do": "get_title",
+            "variable": "title",
+            "validate": {
+                "expData": "python_百度搜索",
+                "mode": "eq"
+            }
         }
-
-    }
-  ]
+    ]
 }

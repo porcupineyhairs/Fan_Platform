@@ -61,4 +61,3 @@ if __name__ == '__main__':
 
     dd = [{'id': 1, 'name': '录入关键词', 'desc': 'desc', 'type': 'id', 'locator': 'kw', 'do': 'send_keys', 'value': 'java'},
           {'id': 2, 'name': '点击确定', 'desc': 'desc', 'type': 'xpath', 'locator': "//input[@id='su']", 'do': 'click'}]
-    print(json.dumps(dd, ensure_ascii=False))

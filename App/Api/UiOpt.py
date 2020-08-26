@@ -13,7 +13,6 @@ from App import auth, db
 from Model.Models import Project, UMethod, UICase, Steps
 from comments.MyRequest import MyArgument
 from comments.Verify import Verify
-from comments.caseParseOpt import CaseParseOpt
 from comments.driverOpt import DriverOpt
 from comments.log import get_log
 from . import v1
@@ -133,8 +132,13 @@ class UiCase(Resource):
             #     s.validate = step['validate']
             for step in steps:
                 s = Steps(name=step['name'], desc=step['desc'], is_method=step['is_method'],
-                          type=step['type'], locator=step['locator'], do=step['do'], value=step['value'],
+                          type=step['type'], locator=step['locator'], do=step['do'],
                           variable=step['variable'], validate=step['validate'])
+
+                if isinstance(step['value'], list):
+                    s.value = json.dumps(step['value'], ensure_ascii=False)
+                else:
+                    s.value = step['value']
                 u.casesteps.append(s)
             u.save()
 
@@ -165,7 +169,6 @@ class UiCase(Resource):
             db.session.close()
 
     def _del_step_info(self, steps: list) -> list:
-        c = CaseParseOpt()
         """
         补充参数
         """
@@ -315,7 +318,7 @@ class Report(Resource):
         info = u.get_steps_info
         for stepInfo in info['caseSteps']:
             if stepInfo['validate']:
-                stepInfo['verify'] = Verify(stepInfo).verify()
+                stepInfo['verify'], stepInfo['verifyData'] = Verify(stepInfo).verify()
 
         return jsonify(dict(code=0, msg='ok', data=info))
 
