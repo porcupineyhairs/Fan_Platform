@@ -1,0 +1,48 @@
+.nav {
+    display: flex;
+    border-bottom: 1px solid #cccccc;
+}
+
+.navItem {
+    width: 88px;
+    height: 44px;
+    text-align: center;
+    line-height: 44px;
+    font-size: 14px;
+}
+
+.navItem.active {
+    font-weight: 900;
+}
+
+.button {
+    border: none;
+    color: blue;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+.tableMethod{
+    font-family: verdana,arial,sans-serif;
+    font-size:11px;
+    color:#333333;
+    border-width: 1px;
+    border-color: #999999;
+    border-collapse: collapse;
+}
+.tableMethod.th {
+    background:#b5cfd2;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #999999;
+}
+.tableMethod.td {
+    background:#dcddc0;
+    border-width: 1px;
+    padding: 8px;
+    border-style: solid;
+    border-color: #999999;
+}

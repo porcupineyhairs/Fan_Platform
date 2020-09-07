@@ -10,7 +10,7 @@ from flask import Flask
 from flask_caching import Cache
 from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_cors import CORS
 from comments.MyBaseQueryOpt import MyBaseQuery
 from comments.config import config
 
@@ -22,6 +22,7 @@ catch = Cache()
 def create_app(config_name="default"):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+    CORS(app, supports_credentials=True)  # 设置跨域
     db.init_app(app)
     catch.init_app(app)
 
