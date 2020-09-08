@@ -4,11 +4,11 @@
 }
 
 .navItem {
-    width: 88px;
-    height: 44px;
+    width: 188px;
+    height: 144px;
     text-align: center;
-    line-height: 44px;
-    font-size: 14px;
+    line-height: 144px;
+    font-size: 114px;
 }
 
 .navItem.active {
@@ -35,14 +35,14 @@
 .tableMethod.th {
     background:#b5cfd2;
     border-width: 1px;
-    padding: 8px;
+    padding: 50px;
     border-style: solid;
     border-color: #999999;
 }
 .tableMethod.td {
     background:#dcddc0;
     border-width: 1px;
-    padding: 8px;
+    padding: 45px;
     border-style: solid;
     border-color: #999999;
 }
