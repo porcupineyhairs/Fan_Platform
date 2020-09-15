@@ -196,12 +196,9 @@ class Method(Resource):
         ProjectId = parse.parse_args().get('ProjectId')
         methodName = parse.parse_args().get('methodName')
         methodDesc = parse.parse_args().get('methodDesc')
-        # 验证ProjectId
-        Project.assertIdExisted(ProjectId)
         body = json.dumps(request.json.get("methodBody"), ensure_ascii=False)
         try:
-            u = UMethod(pid=ProjectId, name=methodName, desc=methodDesc, body=body, creator=creator)
-            u.save()
+            u = UMethod(pid=ProjectId, name=methodName, desc=methodDesc, body=body, creator=creator).save()
             return jsonify(dict(code=1, data=u.id, msg="ok"))
         except Exception as e:
             log.exception(e)

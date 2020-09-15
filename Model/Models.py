@@ -471,11 +471,17 @@ class UMethod(Base):
     updater = db.Column(db.String(20), comment="修改人")
 
     def __init__(self, pid, name, body, creator, desc=""):
+        # 验证projectID
+        Project.assertIdExisted(pid)
+        # 验证 name
+        self.assertName(name)
+
         self.project_id = pid
         self.name = name
         self.desc = desc
         self.body = body
         self.creator = creator
+
 
     def __repr__(self):
         return f"name:{self.name}"
