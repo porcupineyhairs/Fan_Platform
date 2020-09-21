@@ -19,7 +19,6 @@ log = get_log(__file__)
 
 class ProjectOpt(Resource):
 
-    @auth.login_required
     def get(self):
         """
         获取project  id,[id,id].None 三种
