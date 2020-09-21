@@ -8,8 +8,3 @@ flask_restful + celery
 - UI自动化
 
 
-# UI自动化演示
-
-<video id="video" controls="" preload="none">
-<source id="mp4" src="runDemo.mp4" type="video/mp4">
-</video>
