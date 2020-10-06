@@ -66,7 +66,7 @@ class UiCase(Resource):
 
     def get(self):
         parse = reqparse.RequestParser(argument_class=MyArgument)
-        parse.add_argument("caseId", type=str, required=True, help="caseId 不能为空")
+        parse.add_argument("caseId", type=str, required=False, help="caseId 不能为空")
         parse.add_argument("steps", type=str)
         caseId = parse.parse_args().get("caseId")
         steps = parse.parse_args().get("steps")
@@ -198,7 +198,8 @@ class Method(Resource):
         methodDesc = parse.parse_args().get('methodDesc')
         body = json.dumps(request.json.get("methodBody"), ensure_ascii=False)
         try:
-            u = UMethod(pid=ProjectId, name=methodName, desc=methodDesc, body=body, creator=creator).save()
+            u = UMethod(pid=ProjectId, name=methodName, desc=methodDesc, body=body, creator=creator)
+            u.save()
             return jsonify(dict(code=1, data=u.id, msg="ok"))
         except Exception as e:
             log.exception(e)
