@@ -17,28 +17,26 @@ from comments.log import get_log
 log = get_log(__file__)
 
 
-@v1.route("/login",methods=['POST'])
+@v1.route("/login", methods=['POST'])
 def login():
-    username =request.json.get("username")
-    password =request.json.get('password')
+    username = request.json.get("username", "")
+    password = request.json.get('password', "")
     user = User.query.filter(User.username == username).first()
     if user:
-        res=user.verify_password(password)
+        res = user.verify_password(password)
         if res:
             token = user.generate_auth_token(6000)
-            return jsonify(dict(token=token.decode("ascii")))
+            return jsonify(dict(code=0, data=token.decode("ascii"),msg="success"))
+        else:
+            return jsonify(dict(code=1, data="", msg="err password"))
+    return jsonify(dict(code=1, data="", msg="null user"))
 
-    return jsonify({"err":"NO user"})
 
-
-@v1.route("/getToken",methods=["POST"])
+@v1.route("/getToken", methods=["POST"])
 @auth.login_required
 def get_auth_token():
-    try:
-        token = g.user.generate_auth_token(600)
-        return jsonify(dict(token=token.decode("ascii")))
-    except Exception as e:
-        log.exception(e)
+    token = g.user.generate_auth_token(600)
+    return jsonify(dict(token=token.decode("ascii")))
 
 
 class NewPart(Resource):
@@ -162,10 +160,6 @@ class UserOpt(Resource):
             return jsonify(dict(code=1, err=f"错误:{str(e)}"))
         finally:
             db.session.close()
-
-
-
-
 
 
 api_script = Api(v1)

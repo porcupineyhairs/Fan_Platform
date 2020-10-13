@@ -7,13 +7,13 @@
 import time
 
 import jwt
-from flask import current_app, abort
+from flask import current_app
 from sqlalchemy import desc
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from App import db
 from comments.log import get_log
-
+from comments.MyBaseQueryOpt import handelAbort
 log = get_log(__name__)
 
 
@@ -33,7 +33,7 @@ class Base(db.Model):
     def assertName(cls, name):
         res = cls.query.filter_by(name=name).first()
         if res:
-            abort(400, f"已存在  {name}!")
+            handelAbort(f"已存在  {name}!")
 
     @classmethod
     def get(cls, id):
@@ -46,7 +46,7 @@ class Base(db.Model):
         except Exception as e:
             log.exception(e)
             db.session.rollback()
-            abort(500, f"err:{e}")
+            handelAbort( f"err:{str(e)}")
 
     def Delete(self):
         try:
@@ -55,7 +55,7 @@ class Base(db.Model):
         except Exception as e:
             log.exception(e)
             db.session.rollback()
-            abort(500, f"err:{e}")
+            handelAbort( f"err:{str(e)}")
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -63,7 +63,7 @@ class Base(db.Model):
             db.session.commit()
         except Exception as e:
             log.exception(e)
-            abort(500, f"err:{e}")
+            handelAbort(f"err:{str(e)}")
 
 
 # 用戶
@@ -154,14 +154,14 @@ class Project(Base):
     def assertIdExisted(cls, id):
         p = cls.query.get(id)
         if not p:
-            abort(400, f"projectId {id} 不存在或删除")
+            handelAbort(f"projectId {id} 不存在或删除")
         return p
 
     @classmethod
     def assertName(cle, name):
-        res = cle.query.filter_by(project_name=name).first()
+        res = cle.query.filter_by(project_name=name, status=1).first()
         if res:
-            abort(400, "projectName 重复!")
+            handelAbort("projectName 重复!")
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -213,13 +213,15 @@ class Interfaces(Base):
     def assertName(cle, name):
         res = cle.query.filter_by(interface_name=name).first()
         if res:
-            abort(400, f"interface_name 重复!")
+            handelAbort("interface_name 重复!")
+
 
     @classmethod
     def assertIdExisted(cls, id):
         p = cls.query.get(id)
         if not p or p.status == 0:
-            abort(400, "interface 不存在或删除")
+            handelAbort("interface 不存在或删除")
+
 
     def delete(self):
         self.status = self.DELETE_STATUS
@@ -250,7 +252,7 @@ class Envs(Base):
     def assertIdExisted(cls, id):
         p = cls.query.get_or_NoFound(id)
         if not p or p.status == 0:
-            abort(400, "envId 不存在或删除")
+            handelAbort("envId 不存在或删除")
         return p
 
     def delete(self):
@@ -308,7 +310,7 @@ class Case(Base):
     def assertName(cls, name):
         res = cls.query.filter_by(name=name).first()
         if res:
-            abort(400, "caseName 重复!")
+            handelAbort("caseNamec存在")
 
     def __repr__(self):
         return f"name:{self.name}"
@@ -452,9 +454,9 @@ class Steps(Base):
         self.variable = variable
         self.validate = validate
 
-    def assertDo(self, do: str) -> abort:
+    def assertDo(self, do: str):
         if do not in DO:
-            abort(400, f"Parameter:{do} not support")
+            handelAbort( f"Parameter:{do} not support")
         return do
 
     def __repr__(self):
@@ -481,7 +483,6 @@ class UMethod(Base):
         self.desc = desc
         self.body = body
         self.creator = creator
-
 
     def __repr__(self):
         return f"name:{self.name}"

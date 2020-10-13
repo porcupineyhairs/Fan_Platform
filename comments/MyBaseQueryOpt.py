@@ -5,8 +5,7 @@
 @desc: 重新封装下BaseQuery
 """
 
-from flask import abort
-# from flask_restful import abort
+from flask_restful import abort
 from flask_sqlalchemy import BaseQuery
 
 from .log import get_log
@@ -24,9 +23,11 @@ class MyBaseQuery(BaseQuery):
     def get_or_NoFound(self, ident):
         rv = self.get(ident)
         if not rv:
-            err_msg = "id错误或不存在"
-            abort(400, err_msg)
+            handelAbort("id错误或不存在")
         elif rv.status == 0:
-            err_msg = 'id已删除'
-            abort(400, err_msg)
+            handelAbort("id已删除")
         return rv
+
+
+def handelAbort(msg):
+    abort(dict(code=1, data="", msg=msg))

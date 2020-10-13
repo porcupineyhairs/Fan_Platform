@@ -200,11 +200,11 @@ class Method(Resource):
         try:
             u = UMethod(pid=ProjectId, name=methodName, desc=methodDesc, body=body, creator=creator)
             u.save()
-            return jsonify(dict(code=1, data=u.id, msg="ok"))
+            return jsonify(dict(code=0, data=u.id, msg="ok"))
         except Exception as e:
             log.exception(e)
             db.session.rollback()
-            return jsonify(dict(code=0, err=f"错误:{str(e)}"))
+            return jsonify(dict(code=1, data="", msg=f"错误:{str(e)}"))
         finally:
             db.session.close()
 
@@ -241,18 +241,18 @@ class Method(Resource):
         methodId = parse.parse_args().get('methodId')
 
         try:
-            UMethod.get(methodId).delete()
-            return jsonify(dict(code=1, data="", msg="ok"))
+            UMethod.get(methodId).Delete()
+            return jsonify(dict(code=0, data="", msg="ok"))
         except Exception as e:
             log.exception(e)
             db.session.rollback()
-            return jsonify(dict(code=0, err=f"错误:{str(e)}"))
+            return jsonify(dict(code=1, data="", msg=f"错误:{str(e)}"))
         finally:
             db.session.close()
 
     def get(self):
         methodId = request.args.get("methodId")
-        data = {"code": 1}
+        data = {"code": 0}
         try:
             if methodId:
                 m = [UMethod.get(methodId)]
@@ -260,13 +260,13 @@ class Method(Resource):
                 m = UMethod.all()
 
             data['data'] = [{"projectId": i.project_id, "id": i.id, "status": i.status, "name": i.name, "desc": i.desc,
-                             "body": json.loads(i.body),
+                             "methodBody": json.loads(i.body),
                              "creator": i.creator} for i in m]
             return jsonify(data)
 
         except Exception as e:
             log.exception(e)
-            return jsonify(dict(code=0, err=f"错误:{str(e)}"))
+            return jsonify(dict(code=1, data="", msg=f"错误:{str(e)}"))
 
 
 class Run(Resource):

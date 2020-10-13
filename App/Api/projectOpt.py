@@ -6,9 +6,10 @@
 """
 
 from flask import jsonify, request
-from flask_restful import Api, Resource
+from flask_restful import Api, Resource, reqparse
 
 from Model.Models import Project
+from comments.MyRequest import MyArgument
 from comments.log import get_log
 from . import v1
 from .errors_and_auth import is_admin
@@ -46,17 +47,16 @@ class ProjectOpt(Resource):
     @auth.login_required
     @is_admin
     def post(self):
-        pName = request.json.get("projectName")
-        pDesc = request.json.get("projectDesc")
+        parse = reqparse.RequestParser(argument_class=MyArgument)
+        parse.add_argument("projectName", type=str, required=True, help="methodId 不能为空")
+        parse.add_argument("projectDesc", type=str)
+        projectName = parse.parse_args().get('projectName')
+        projectDesc = parse.parse_args().get('projectDesc')
 
-        if not pDesc or not pName:
-            return jsonify(dict(code=1, err="传入必传"))
+        Project.assertName(projectName)
 
-        p = Project.query.filter(Project.project_name == pName).first()
-        if p:
-            return jsonify(dict(code=1, err="projectName存在了"))
         try:
-            Project(name=pName, desc=pDesc).save()
+            Project(name=projectName, desc=projectDesc).save()
             return jsonify(dict(code=0, data="", msg="ok"))
         except Exception as e:
             log.exception(e)
