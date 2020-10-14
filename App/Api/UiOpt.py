@@ -16,7 +16,6 @@ from comments.Verify import Verify
 from comments.driverOpt import DriverOpt
 from comments.log import get_log
 from . import v1
-from .tasks import runCase
 
 log = get_log(__name__)
 
@@ -279,26 +278,23 @@ class Run(Resource):
         db.session.commit()
 
         if back:
-
-            # celery运行
-            runCase.apply_async(args=[caseId, ])
-            return jsonify(dict(code=0, msg='运行成功', caseId=case.id))
+            try:
+                from App.celeryOpt import runCase
+                runCase.apply_async(args=[caseId])
+                return jsonify(dict(code=0, msg='运行成功', caseId=case.id))
+            except Exception as e:
+                return jsonify(dict(code=1, data="", msg=f"错误:{str(e)}"))
 
         else:
+            try:
+                case = UICase.get(caseId)
+                info = case.caseInfo
+                driver = DriverOpt(headless=info['headless'])
+                driver.run(caseId, info["steps"])
 
-            case = UICase.get(caseId)
-            info = {"caseId": case.id, "name": case.name, "desc": case.desc,
-                    "creator": case.creator,
-                    "headless": case.headless, "windowsSize": case.windowsSize,
-                    "status": case.status, "state": case.state,
-                    "steps": [{"id": s.id, "name": s.name, "desc": s.desc, "methodId": s.is_method, "type": s.type,
-                               "locator": s.locator,
-                               "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
-                              s in case.casesteps]}
-            driver = DriverOpt(headless=info['headless'])
-            driver.run(caseId, info["steps"])
-
-            return jsonify(dict(code=0, msg='运行完成', caseId=case.id))
+                return jsonify(dict(code=0, msg='运行完成', caseId=case.id))
+            except Exception as e:
+                return jsonify(dict(code=1, data="", msg=f"错误:{str(e)}"))
 
 
 class Report(Resource):

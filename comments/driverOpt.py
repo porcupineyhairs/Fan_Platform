@@ -64,7 +64,7 @@ class DriverOpt(PageBase):
             # 截图
             from comments.seve_pic import getPicPath
             path = getPicPath()
-            # 判断时候存在
+            # 判断是否存在
             if current_step.pic:
                 try:
                     os.remove(current_step.pic)

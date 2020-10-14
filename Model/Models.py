@@ -383,6 +383,17 @@ class UICase(Base):
         return self.casesteps
 
     @property
+    def caseInfo(self):
+        info = {"caseId": self.id, "name": self.name, "desc": self.desc,
+                "creator": self.creator,
+                "headless": self.headless, "windowsSize": self.windowsSize,
+                "status": self.status, "state": self.state,
+                "steps": [{"id": s.id, "name": s.name, "desc": s.desc, "methodId": s.is_method, "type": s.type,
+                           "locator": s.locator,
+                           "do": s.do, "value": s.value, "variable": s.variable, "validate": s.validate} for
+                          s in self.casesteps]}
+        return info
+    @property
     def get_steps_info(self):
 
         info = []
