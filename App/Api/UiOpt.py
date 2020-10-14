@@ -5,8 +5,9 @@
 @desc: UI自动化用例接口
 """
 import json
+import os
 
-from flask import request, jsonify, g
+from flask import request, jsonify, g, send_file
 from flask_restful import Resource, Api, reqparse
 
 from App import auth, db
@@ -315,6 +316,14 @@ class Report(Resource):
                 stepInfo['verify'], stepInfo['verifyData'] = Verify(stepInfo).verify()
 
         return jsonify(dict(code=0, msg='ok', data=info))
+
+
+@v1.route("/getPic/<path:url>")
+def getPic(url):
+    basedir = os.path.abspath(os.path.dirname(__name__))
+    file_path = os.path.join(basedir, url)
+
+    return send_file(file_path)
 
 
 api_script = Api(v1)

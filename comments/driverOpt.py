@@ -67,8 +67,8 @@ class DriverOpt(PageBase):
             # 判断是否存在
             if current_step.pic:
                 try:
-                    os.remove(current_step.pic)
-                except Exception:
+                    os.remove(os.path.join(os.path.split(os.path.dirname(__file__))[0], current_step.pic))
+                except:
                     pass
                 # 截圖到目錄
             current_step.log = self.Save_Pic(path)
