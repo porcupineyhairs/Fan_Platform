@@ -58,8 +58,6 @@ class DriverOpt(PageBase):
                 methodSteps = self.__del_method_value(methodSteps, json.loads(step['value']))
             self.__run_method_steps(methodSteps)
 
-
-
         elif do == 'screenshot':
             # 截图
             from comments.seve_pic import getPicPath
