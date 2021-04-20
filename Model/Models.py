@@ -497,3 +497,17 @@ class UMethod(Base):
 
     def __repr__(self):
         return f"name:{self.name}"
+
+
+
+class Chuang(Base):
+    __tablename__ = "chuangshiyun"
+    customerName = db.Column(db.String(20),unique=True,nullable=False,comment="用户名称")
+    eventType = db.Column(db.String(30),nullable=False,comment="事件类型")
+    eventContent =  db.Column(db.TEXT,comment="内容")
+    eventProgress = db.Column(db.String(30),nullable=False,comment="事件进展")
+
+
+
+
+

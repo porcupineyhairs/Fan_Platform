@@ -66,6 +66,8 @@ class NewPart(Resource):
     @is_admin
     def get(self):
         """查询部门"""
+
+
         try:
             partId = request.args.get("partId")
             if partId:
@@ -129,21 +131,20 @@ class UserOpt(Resource):
     @is_admin
     def get(self):
         user_id = request.args.get("id")
-        try:
-            if user_id:
-                user = [User.get(user_id)]
-            else:
-                user = User.all()
-            data = {
-                "code": 0,
-                "msg": "ok",
-                "data": [{"id": i.id, "status": i.status, "name": i.username, "email": i.email, "gender": i.gender,
-                          "part": i.part, } for i in user]}
-            return jsonify(data)
-        except Exception as e:
-            db.session.rollback()
-            log.exception(str(e))
-            return jsonify(dict(code=1, data="", err=f"错误:{str(e)}"))
+
+        if user_id:
+            user = [User.get(user_id)]
+            log.info(f"{__name__} userID:{user_id}")
+        else:
+            log.info(msg=f"{__name__} userID:None")
+            user = User.all()
+        data = {
+            "code": 0,
+            "msg": "ok",
+            "data": [{"id": i.id, "status": i.status, "name": i.username, "email": i.email, "gender": i.gender,
+                      "part": i.part, } for i in user]}
+        return jsonify(data)
+
 
     @auth.login_required
     @is_admin

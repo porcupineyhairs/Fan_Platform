@@ -77,3 +77,4 @@ def get_log(logger_name):
 if __name__ == '__main__':
     log = get_log(__file__)
     log.error("hha")
+    log.info("dasdaa")

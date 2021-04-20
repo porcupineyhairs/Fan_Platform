@@ -23,8 +23,10 @@ class MyBaseQuery(BaseQuery):
     def get_or_NoFound(self, ident):
         rv = self.get(ident)
         if not rv:
+            log.error("id错误或不存在")
             handelAbort("id错误或不存在")
         elif rv.status == 0:
+            log.error("id已删除")
             handelAbort("id已删除")
         return rv
 

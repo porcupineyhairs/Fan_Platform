@@ -48,7 +48,7 @@ class ProjectOpt(Resource):
     @is_admin
     def post(self):
         parse = reqparse.RequestParser(argument_class=MyArgument)
-        parse.add_argument("projectName", type=str, required=True, help="methodId 不能为空")
+        parse.add_argument("projectName", type=str, required=True, help="projectName 不能为空")
         parse.add_argument("projectDesc", type=str)
         projectName = parse.parse_args().get('projectName')
         projectDesc = parse.parse_args().get('projectDesc')
