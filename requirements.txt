@@ -11,7 +11,7 @@ attrs==19.3.0
 billiard==3.3.0.23
 blinker==1.4
 cachelib==0.1
-celery==3.1.25
+celery==5.2.2
 certifi==2019.11.28
 cffi==1.14.0
 chardet==3.0.4
