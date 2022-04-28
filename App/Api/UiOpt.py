@@ -7,7 +7,7 @@
 import json
 import os
 
-from flask import request, jsonify, g, send_file
+from flask import request, jsonify, g, send_file, safe_join
 from flask_restful import Resource, Api, reqparse
 
 from App import auth, db
@@ -321,7 +321,7 @@ class Report(Resource):
 @v1.route("/getPic/<path:url>")
 def getPic(url):
     basedir = os.path.abspath(os.path.dirname(__name__))
-    file_path = os.path.join(basedir, url)
+    file_path = safe_join(basedir, url)
 
     return send_file(file_path)
 
